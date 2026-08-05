@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店舗成約状況・花見川 VS 八千代組 パフォーマンスボード</title>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@500;700;900&family=Outfit:wght@800;900&family=Black+Ops+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f4f7fc;
+            --panel-bg: #ffffff;
+            --panel-border: rgba(203, 213, 225, 0.8);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent-blue: #2563eb;
+            --accent-green: #16a34a;
+            --accent-gold: #f59e0b;
+            --accent-pink: #ec4899;
+            
+            /* チームカラー設定 */
+            --team-hanamigawa: #2563eb;
+            --team-hanamigawa-bg: #eff6ff;
+            --team-yachiyo: #ef4444;
+            --team-yachiyo-bg: #fef2f2;
+
+            /* サブチーム */
+            --sub-yamaguchi: #10b981;
+            --sub-takada: #8b5cf6;
+            --sub-sano: #f59e0b;
+            --sub-other: #64748b;
+
+            --shadow-card: 0 8px 20px -4px rgba(0, 0, 0, 0.06);
+        }
+
+        * { box-sizing: border-box; font-family: 'M PLUS 1p', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-main);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(239, 68, 68, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0; padding: 15px 10px;
+            max-width: 1350px; margin-left: auto; margin-right: auto; min-height: 100vh;
+        }
+
+        /* ヘッダー & ナビゲーション */
+        .app-header {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+            margin-bottom: 20px; padding: 15px 18px; background: var(--panel-bg);
+            border-radius: 20px; border: 1px solid var(--panel-border); box-shadow: var(--shadow-card);
+        }
+
+        .brand-title {
+            font-size: 20px; font-weight: 900;
+            background: linear-gradient(135deg, #0f172a, var(--accent-blue), #ef4444, #0f172a);
+            background-size: 300% 300%;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: brandShift 6s ease-in-out infinite;
+        }
+
+        .nav-tabs { display: flex; gap: 6px; background: #f1f5f9; padding: 5px; border-radius: 14px; flex-wrap: wrap; width: 100%; }
+        @media (min-width: 768px) { .nav-tabs { width: auto; } }
+        .tab-btn { flex: 1; text-align: center; padding: 9px 12px; font-size: 13px; font-weight: 800; border: none; border-radius: 10px; background: transparent; color: var(--text-muted); cursor: pointer; transition: transform 0.15s ease, background 0.2s, color 0.2s, box-shadow 0.2s; white-space: nowrap; }
+        .tab-btn:hover { color: var(--accent-blue); transform: translateY(-1px); }
+        .tab-btn:active { transform: scale(0.94); }
+        .tab-btn.active { background: var(--panel-bg); color: var(--accent-blue); box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(14px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* 汎用アニメーション */
+        @keyframes cardPopIn { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes rowIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes winnerGlow { 0%, 100% { box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25); } 50% { box-shadow: 0 12px 32px rgba(245, 158, 11, 0.55); } }
+        @keyframes crownBounce { 0%, 100% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-4px) rotate(-6deg); } 75% { transform: translateY(-2px) rotate(6deg); } }
+        @keyframes vsPulse { from { transform: scale(1); filter: drop-shadow(0 0 0 rgba(245, 158, 11, 0)); } to { transform: scale(1.12); filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5)); } }
+        @keyframes scorePop { 0% { transform: scale(1); } 35% { transform: scale(1.35); } 60% { transform: scale(0.95); } 100% { transform: scale(1); } }
+        @keyframes floatFlower { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-4px) rotate(6deg); } }
+        @keyframes shimmerStripes { from { background-position: 0 0; } to { background-position: 40px 0; } }
+        @keyframes brandShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        @keyframes toastBounceIn { 0% { transform: translateX(-50%) translateY(100px) scale(0.9); opacity: 0; } 60% { transform: translateX(-50%) translateY(-6px) scale(1.03); opacity: 1; } 100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; } }
+
+        .glass-panel { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; padding: 18px; margin-bottom: 18px; box-shadow: var(--shadow-card); }
+        .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+        input[type="date"], input[type="month"], select, input[type="text"], textarea { 
+            background: #f8fafc; border: 1px solid #cbd5e1; color: var(--text-main); padding: 9px 12px; border-radius: 12px; font-weight: 700; outline: none; font-size: 14px;
+        }
+
+        .btn { padding: 9px 15px; font-size: 13px; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
+        .btn:active { transform: translateY(0) scale(0.95); box-shadow: none; }
+        .btn-style { background: #0f172a; color: #fff; }
+        .btn-save { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
+        .btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+        .btn-pink { background: linear-gradient(135deg, #ec4899, #db2777); color: #fff; }
+        .btn-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+        .btn-danger-all { background: #dc2626; color: #fff; margin-left: auto; }
+
+        .toggle-wrapper { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 6px 14px; border-radius: 30px; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: #fff; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-blue); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* 商材カード */
+        .item-card { background: #fff; border: 2px solid var(--panel-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-card); transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s, border-color 0.3s; }
+        .item-card:hover { transform: translateY(-3px); box-shadow: 0 14px 26px -6px rgba(0,0,0,0.12); }
+        .item-card.level-0 { background: #fef2f2; border-color: #fca5a5; }
+        .item-card.level-1 { background: #f6fbf7; border-color: #d1fae5; }
+        .item-card.level-2 { background: #ecfdf5; border-color: #a7f3d0; }
+        .item-card.level-3 { background: #d1fae5; border-color: #6ee7b7; }
+        .item-card.level-complete { background: #eff6ff; border-color: #3b82f6; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2); }
+
+        .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+        .item-title { font-size: 16px; font-weight: 900; color: #0f172a; }
+        .progress-badge { font-size: 12px; font-weight: 800; padding: 5px 12px; border-radius: 20px; }
+        .progress-badge.lvl-0 { background: #fee2e2; color: #991b1b; }
+        .progress-badge.lvl-1 { background: #e6f4ea; color: #166534; }
+        .progress-badge.lvl-2 { background: #dcfce7; color: #15803d; }
+        .progress-badge.lvl-3 { background: #a7f3d0; color: #065f46; }
+        .progress-badge.lvl-complete { background: #dbeafe; color: #1e40af; }
+        .progress-badge.lvl-normal { background: #f0f9ff; color: #0284c7; }
+
+        /* 商材個別削除ボタン */
+        .btn-clear-item {
+            background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;
+            padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 800;
+            cursor: pointer; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn-clear-item:hover { background: #fca5a5; color: #7f1d1d; }
+
+        /* 日別入力：改行禁止・コンパクトバッジスタイル */
+        .members-row { display: flex; flex-wrap: wrap; gap: 5px; }
+        .member-badge { 
+            display: inline-flex; align-items: center; gap: 5px; 
+            padding: 4px 9px; border-radius: 16px; font-size: 11px; font-weight: 800; 
+            cursor: pointer; user-select: none; border: 1.5px solid transparent; transition: all 0.15s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04); white-space: nowrap;
+        }
+        .member-badge:hover { transform: translateY(-1px) scale(1.04); }
+        .member-badge:active { transform: scale(0.92); }
+
+        .badge-yamaguchi { color: #15803d; border-color: #a7f3d0; background: #ecfdf5; }
+        .badge-takada { color: #7e22ce; border-color: #e9d5ff; background: #f3e8ff; }
+        .badge-sano { color: #a16207; border-color: #fef08a; background: #fef9c3; }
+        .badge-yachiyo { color: #be185d; border-color: #fbcfe8; background: #fce7f3; }
+        .badge-other { color: #b91c1c; border-color: #fca5a5; background: #fee2e2; }
+
+        .count-val { background: #ffffff; padding: 1px 5px; border-radius: 8px; font-size: 10px; font-weight: 900; border: 1px solid rgba(0,0,0,0.1); }
+
+        /* スマホ対応グラフコンテナ */
+        .chart-container { position: relative; width: 100%; height: 320px; cursor: pointer; }
+        @media (max-width: 600px) { .chart-container { height: 280px; } }
+
+        /* チーム4つ並びスコアボード */
+        .grid-4-teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+        .team-mini-card { background: #fff; border-radius: 18px; padding: 18px 12px; text-align: center; border: 2px solid #e2e8f0; position: relative; overflow: hidden; transition: transform 0.25s ease; animation: cardPopIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+        .team-mini-card:hover { transform: translateY(-3px); }
+        .team-mini-card.winner { border-color: #f59e0b; background: linear-gradient(135deg, #fff 0%, #fef3c7 100%); transform: scale(1.02); animation: cardPopIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards, winnerGlow 2s ease-in-out infinite 0.45s; }
+        .team-mini-name { font-size: 14px; font-weight: 900; margin-bottom: 4px; }
+        .team-mini-score { font-size: 38px; font-weight: 900; font-family: 'Outfit', sans-serif; line-height: 1; }
+        .team-mini-card.winner .team-mini-score { animation: crownBounce 2s ease-in-out infinite; }
+
+        /* 花見川 VS 八千代組 スコアボード */
+        .battle-arena-wrapper { position: relative; cursor: pointer; margin-bottom: 20px; }
+        .battle-arena-vs {
+            display: grid; grid-template-columns: 1fr 80px 1fr; gap: 12px; align-items: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); padding: 20px 15px;
+            border-radius: 24px; border: 2px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        @media (max-width: 600px) { .battle-arena-vs { grid-template-columns: 1fr; gap: 15px; } }
+
+        .team-vs-card {
+            background: #ffffff; border-radius: 20px; padding: 20px 15px; text-align: center;
+            border: 3px solid #cbd5e1; position: relative; overflow: hidden; transition: all 0.3s;
+        }
+        .team-vs-card.hanamigawa { border-color: #93c5fd; background: linear-gradient(135deg, #fff 0%, #eff6ff 100%); }
+        .team-vs-card.yachiyo { border-color: #fca5a5; background: linear-gradient(135deg, #fff 0%, #fef2f2 100%); }
+        .team-vs-card.winner { border-color: #f59e0b; background: linear-gradient(135deg, #fff 0%, #fef3c7 100%); transform: scale(1.03); animation: winnerGlow 2s ease-in-out infinite; }
+        
+        .trophy-banner { display: none; position: absolute; top: 14px; right: -30px; background: #f59e0b; color: #fff; font-size: 10px; font-weight: 900; padding: 4px 30px; transform: rotate(45deg); }
+        .team-vs-card.winner .trophy-banner { display: block; animation: cardPopIn 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+        .team-vs-name { font-size: 18px; font-weight: 900; }
+        .team-vs-score { font-size: 56px; font-weight: 900; font-family: 'Outfit', sans-serif; line-height: 1; margin: 8px 0; display: inline-block; }
+        .team-vs-score.score-pop { animation: scorePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .vs-badge { font-size: 38px; font-weight: 900; font-family: 'Black Ops One', cursive, sans-serif; font-style: italic; background: linear-gradient(135deg, #ef4444, #f59e0b, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; display: inline-block; animation: vsPulse 1.6s ease-in-out infinite alternate; }
+
+        /* 王冠表示修正スタイル */
+        .winner-crown {
+            font-size: 32px; line-height: 1; margin-bottom: 2px; display: none;
+            font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+        }
+        .team-vs-card.winner .winner-crown, .team-mini-card.winner .winner-crown { display: block; animation: crownBounce 1.6s ease-in-out infinite; }
+
+        /* 画像再現イベントテーブル */
+        .excel-style-table-wrap { background: #ffffff; border-radius: 12px; padding: 15px; border: 2px solid #000; box-shadow: var(--shadow-card); margin-bottom: 20px; }
+        .excel-table-title { text-align: center; font-size: 18px; font-weight: 900; margin-bottom: 10px; color: #000; }
+        .excel-table { width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: 13px; text-align: center; }
+        .excel-table th, .excel-table td { border: 1.5px solid #000; padding: 7px 8px; font-weight: 800; }
+        .excel-table th { background-color: #d9d9d9; color: #000; }
+        .excel-table th.th-kiku { background-color: #ffff00; color: #000; }
+        .excel-table th.th-hasu { background-color: #ff3399; color: #fff; }
+        .excel-table th.th-bara { background-color: #ff0000; color: #fff; }
+        .excel-table th.th-pts { background-color: #ff9900; color: #000; }
+        .excel-table td.td-pts { background: linear-gradient(90deg, #ffcc00, #ff9900); color: #000; font-size: 16px; font-weight: 900; }
+
+        .flower-garden-box { background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%); border: 3px solid #34d399; border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 18px; position: relative; overflow: hidden; }
+        .flower-garden-box > *:not(.sparkle-layer) { position: relative; z-index: 1; }
+        .sparkle-layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+        .sparkle-layer .sparkle { position: absolute; top: -12%; left: 0; opacity: 0; font-size: 16px; animation: sparkleFall linear infinite; }
+        @keyframes sparkleFall {
+            0% { transform: translateY(0) translateX(0) rotate(0deg) scale(0.8); opacity: 0; }
+            12% { opacity: 0.95; }
+            50% { transform: translateY(180px) translateX(var(--drift, 14px)) rotate(180deg) scale(1); }
+            88% { opacity: 0.8; }
+            100% { transform: translateY(380px) translateX(calc(var(--drift, 14px) * -1)) rotate(360deg) scale(0.7); opacity: 0; }
+        }
+        .garden-progress-bar { height: 18px; background: #ffffff; border-radius: 10px; overflow: hidden; border: 2px solid #a7f3d0; margin: 12px 0; }
+        .garden-progress-fill {
+            height: 100%;
+            background-image: linear-gradient(90deg, #ffff00, #ff3399, #ff0000),
+                linear-gradient(45deg, rgba(255,255,255,0.25) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.25) 75%, transparent 75%, transparent);
+            background-size: 100% 100%, 28px 28px;
+            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            animation: shimmerStripes 1s linear infinite;
+        }
+        .flower-canvas { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; min-height: 120px; background: rgba(255,255,255,0.7); border-radius: 16px; padding: 12px; border: 1px dashed #6ee7b7; transition: box-shadow 0.6s ease; }
+        .flower-canvas.blooming { animation: gardenGlow 2.4s ease-in-out infinite; }
+        @keyframes gardenGlow {
+            0%, 100% { box-shadow: 0 0 0 rgba(52, 211, 153, 0); }
+            50% { box-shadow: 0 0 26px rgba(52, 211, 153, 0.55), inset 0 0 18px rgba(255, 255, 255, 0.6); }
+        }
+        .flower-icon { font-size: 26px; display: inline-block; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards, floatFlower 3s ease-in-out infinite 0.3s; }
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+
+        .forum-input-card { background: #f8fafc; border-radius: 16px; padding: 16px; margin-bottom: 18px; border: 1px solid #e2e8f0; }
+        .forum-list { display: flex; flex-direction: column; gap: 10px; }
+        .forum-post { background: #fff; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; animation: rowIn 0.35s ease backwards; transition: transform 0.2s; }
+        .forum-post:hover { transform: translateX(3px); }
+        .forum-post-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px; }
+
+        .table-wrap { overflow-x: auto; border-radius: 16px; background: #fff; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; }
+        th, td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; }
+        th { background: #f8fafc; font-weight: 800; }
+        table tbody tr { animation: rowIn 0.35s ease backwards; transition: background 0.2s; }
+        table tbody tr:hover { background: #f8fafc; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #fff; padding: 22px; border-radius: 20px; width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto; }
+        .target-input-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 700; font-size: 13px; }
+        .target-input-group input { width: 85px; padding: 6px; border-radius: 8px; border: 1px solid #cbd5e1; text-align: right; }
+
+        .copy-hint { position: absolute; top: 8px; right: 12px; font-size: 10px; font-weight: 700; color: var(--text-muted); background: rgba(241,245,249,0.95); padding: 3px 8px; border-radius: 10px; pointer-events: none; z-index: 5; }
+        .toast { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 30px; font-weight: 800; font-size: 13px; transition: all 0.3s; z-index: 2000; opacity: 0; }
+        .toast.show { animation: toastBounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    </style>
+</head>
+<body>
+
+<!-- アプリヘッダー -->
+<div class="app-header">
+    <div class="brand-title">🔥 花見川 VS 八千代組 パフォーマンスHUB</div>
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchPage('entryPage')">📝 日別入力</button>
+        <button class="tab-btn" onclick="switchPage('comparePage')">📊 個人・比較分析</button>
+        <button class="tab-btn" onclick="switchPage('pointsPage')">⚔️ 花見川 VS 八千代</button>
+        <button class="tab-btn" onclick="switchPage('ienakaPage')">🏠 イエナカ進捗表</button>
+        <button class="tab-btn" onclick="switchPage('flowerPage')">🌺 菊・蓮・薔薇イベント</button>
+        <button class="tab-btn" onclick="switchPage('forumPage')">📮 ご意見箱</button>
+    </div>
+</div>
+
+<!-- PAGE 1: 日別入力 -->
+<div id="entryPage" class="page-content active">
+    <div class="glass-panel">
+        <div class="controls">
+            <div class="control-group">
+                <span>📅 日付選択:</span>
+                <input type="date" id="datePicker">
+            </div>
+            <button class="btn btn-save" onclick="saveDataToServer()">💾 サーバーに保存</button>
+            <button class="btn btn-style" id="viewToggleBtn" onclick="toggleView()">👀 表示切り替え: 個人別</button>
+            <button class="btn btn-gold" onclick="openTargetModal()">🎯 月間目標設定</button>
+            <button class="btn btn-danger" onclick="clearCurrentDateData()">🗑 本日分クリア</button>
+            <button class="btn btn-danger btn-danger-all" onclick="clearAllData()">🔒 全データ削除</button>
+        </div>
+    </div>
+
+    <div id="itemsContainer"></div>
+
+    <div class="glass-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <h2 style="font-size: 15px; margin: 0;">📈 月間実績 & 着地見込み（花見川 VS 八千代組）</h2>
+            <div class="toggle-wrapper">
+                <span style="font-size:12px; font-weight:800;">着地見込み表示:</span>
+                <label class="switch">
+                    <input type="checkbox" id="forecastToggle" checked onchange="updateMainChart()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        <div class="chart-container" id="mainChartWrap">
+            <span class="copy-hint">💡 グラフ長押しで画像コピー</span>
+            <canvas id="summaryChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE 2: 個人比較分析（人物 ＆ 商材選択機能） -->
+<div id="comparePage" class="page-content">
+    <div class="glass-panel">
+        <div class="controls">
+            <div class="control-group">
+                <span>📆 集計対象月:</span>
+                <input type="month" id="monthPicker">
+            </div>
+            <div class="control-group">
+                <span>📊 表示データ:</span>
+                <select id="dataTypeSelect" onchange="renderComparisonPage()">
+                    <option value="actual">当月累積実績</option>
+                    <option value="forecast">月末着地見込み</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- メンバー選択エリア -->
+    <div class="glass-panel">
+        <div style="font-size: 13px; font-weight: 800; margin-bottom: 8px;">👥 比較するメンバーを選択</div>
+        <div style="margin-bottom: 8px;">
+            <button class="btn btn-style" style="padding: 4px 10px; font-size: 11px;" onclick="selectAllMembers(true)">全員選択</button>
+            <button class="btn btn-style" style="padding: 4px 10px; font-size: 11px;" onclick="selectAllMembers(false)">選択解除</button>
+        </div>
+        <div class="members-row" id="memberCheckboxes"></div>
+    </div>
+
+    <!-- 商材選択エリア -->
+    <div class="glass-panel">
+        <div style="font-size: 13px; font-weight: 800; margin-bottom: 8px;">📦 比較表示する商材を選択</div>
+        <div style="margin-bottom: 8px;">
+            <button class="btn btn-style" style="padding: 4px 10px; font-size: 11px;" onclick="selectAllItems(true)">全商材選択</button>
+            <button class="btn btn-style" style="padding: 4px 10px; font-size: 11px;" onclick="selectAllItems(false)">選択解除</button>
+        </div>
+        <div class="members-row" id="itemCheckboxes"></div>
+    </div>
+
+    <div class="glass-panel">
+        <h2 style="font-size: 15px; margin-top: 0;">📋 個別比較データ表</h2>
+        <div class="table-wrap">
+            <table id="comparisonTable">
+                <thead><tr id="tableHeader"></tr></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        <h2 style="font-size: 15px; margin-top: 0;">📊 選択メンバー・商材の比較グラフ</h2>
+        <div class="chart-container" id="compareChartWrap">
+            <span class="copy-hint">💡 グラフ長押しで画像コピー</span>
+            <canvas id="compareChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE 3: チーム点数対抗 (花見川 VS 八千代組) -->
+<div id="pointsPage" class="page-content">
+    <div class="battle-arena-wrapper" id="pointsArenaWrap">
+        <span class="copy-hint">💡 結果長押しで画像コピー</span>
+        <div class="battle-arena-vs" id="pointsArena">
+            <div class="team-vs-card hanamigawa" id="teamHanamigawaCard">
+                <div class="trophy-banner">1位</div>
+                <div class="winner-crown">👑</div>
+                <div class="team-vs-name" style="color:var(--team-hanamigawa);">花見川チーム</div>
+                <div class="team-vs-score" id="scoreHanamigawa" style="color:var(--team-hanamigawa);">0</div>
+                <div style="font-size:11px; font-weight:800; color:var(--text-muted);">TOTAL POINTS</div>
+            </div>
+
+            <div style="text-align:center;">
+                <div class="vs-badge">VS</div>
+            </div>
+
+            <div class="team-vs-card yachiyo" id="teamYachiyoCard">
+                <div class="trophy-banner">1位</div>
+                <div class="winner-crown">👑</div>
+                <div class="team-vs-name" style="color:var(--team-yachiyo-txt);">八千代組</div>
+                <div class="team-vs-score" id="scoreYachiyo" style="color:var(--team-yachiyo-txt);">0</div>
+                <div style="font-size:11px; font-weight:800; color:var(--text-muted);">TOTAL POINTS</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        <h2 style="font-size: 15px; margin-top: 0;">🎖 個人別・獲得点数順位表</h2>
+        <div class="table-wrap">
+            <table id="pointsTable">
+                <thead><tr id="pointsTableHeader"></tr></thead>
+                <tbody id="pointsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE 4: イエナカ進捗表 (4チーム対抗: サノリーズ・新山口・髙田WEST・その他) -->
+<div id="ienakaPage" class="page-content">
+    <div class="battle-arena-wrapper" id="ienakaArenaWrap">
+        <span class="copy-hint">💡 進捗結果長押しで画像コピー</span>
+        <h2 style="font-size: 16px; margin-top: 0; color:var(--accent-blue);">🏠 イエナカ進捗表（Home5G / ドコモ光 / ドコモ電気）</h2>
+        <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">※WIFI系（Home5G・ドコモ光）およびドコモ電気のチーム別成約件数まとめ</div>
+        <div class="grid-4-teams" id="ienaka4TeamsGrid"></div>
+    </div>
+
+    <div class="glass-panel">
+        <h2 style="font-size: 15px; margin-top: 0;">📋 イエナカ個人別成約内訳</h2>
+        <div class="table-wrap">
+            <table id="ienakaTable">
+                <thead>
+                    <tr><th>メンバー名</th><th>所属チーム</th><th>Home5G</th><th>ドコモ光</th><th>ドコモ電気</th><th>イエナカ合計</th></tr>
+                </thead>
+                <tbody id="ienakaTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE 5: 菊・蓮・薔薇イベント画面 (Excelデザイン再現) -->
+<div id="flowerPage" class="page-content">
+    <div class="flower-garden-box" id="flowerBoxWrap" style="position:relative; cursor:pointer;">
+        <div class="sparkle-layer" id="sparkleLayer"></div>
+        <span class="copy-hint">💡 長押しで画像コピー</span>
+        <h2 style="font-size: 20px; margin-top:0; color:#065f46;">🌺 菊・蓮・薔薇 満開ガーデン 🌸</h2>
+        <div style="font-size:12px; color:#047857;">イベント目標：全体で <b>100件</b> 到達で満開の花畑が完成！（菊:2点 / 蓮:3点 / 薔薇:5点）</div>
+        
+        <div class="garden-progress-bar">
+            <div class="garden-progress-fill" id="flowerProgressBar" style="width: 0%;"></div>
+        </div>
+        <div style="font-size:13px; font-weight:900; color:#065f46; margin-bottom:12px;" id="flowerProgressText">0 / 100件 (0%)</div>
+
+        <div class="flower-canvas" id="flowerGardenCanvas"></div>
+    </div>
+
+    <!-- 個人進捗表 -->
+    <div class="excel-style-table-wrap" id="eventIndividualTableWrap" style="position:relative; cursor:pointer;">
+        <span class="copy-hint">💡 長押しで画像コピー</span>
+        <div class="excel-table-title">個人進捗表</div>
+        <table class="excel-table">
+            <thead>
+                <tr>
+                    <th style="width:18%;">チーム</th>
+                    <th style="width:26%;">名前</th>
+                    <th class="th-kiku" style="width:14%;">菊</th>
+                    <th class="th-hasu" style="width:14%;">蓮</th>
+                    <th class="th-bara" style="width:14%;">薔薇</th>
+                    <th class="th-pts" style="width:14%;">得点</th>
+                </tr>
+            </thead>
+            <tbody id="eventIndividualTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- チーム進捗表 -->
+    <div class="excel-style-table-wrap" id="eventTeamTableWrap" style="position:relative; cursor:pointer;">
+        <span class="copy-hint">💡 長押しで画像コピー</span>
+        <div class="excel-table-title">チーム進捗表</div>
+        <table class="excel-table">
+            <thead>
+                <tr>
+                    <th style="width:28%;">チーム</th>
+                    <th class="th-kiku" style="width:18%;">菊</th>
+                    <th class="th-hasu" style="width:18%;">蓮</th>
+                    <th class="th-bara" style="width:18%;">薔薇</th>
+                    <th class="th-pts" style="width:18%;">得点</th>
+                </tr>
+            </thead>
+            <tbody id="eventTeamTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- PAGE 6: みんなのご意見箱 -->
+<div id="forumPage" class="page-content">
+    <div class="glass-panel">
+        <h2 style="font-size: 17px; margin-top:0; color:var(--accent-pink);">📮 みんなのご意見箱・社内掲示板</h2>
+        <div class="forum-input-card">
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <input type="text" id="forumNameInput" placeholder="投稿者の名前（例：金城）">
+                <textarea id="forumTextInput" rows="3" placeholder="要件・ご意見・改善案などを入力してください..."></textarea>
+                <button class="btn btn-pink" style="align-self:flex-end;" onclick="submitForumPost()">✉️ 掲示板に投稿する</button>
+            </div>
+        </div>
+
+        <h3 style="font-size: 14px; margin-top: 18px;">📋 投稿一覧</h3>
+        <div class="forum-list" id="forumListContainer"></div>
+    </div>
+</div>
+
+<!-- 目標設定モーダル -->
+<div class="modal" id="targetModal">
+    <div class="modal-content">
+        <h3 style="color: var(--accent-gold); margin-top:0;">🎯 月間目標数値設定</h3>
+        <div id="targetInputs"></div>
+        <div style="margin-top: 18px; text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+            <button class="btn btn-style" onclick="closeTargetModal()">キャンセル</button>
+            <button class="btn btn-gold" onclick="saveTargets()">目標を保存</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="copyToast">📋 クリップボードに画像をコピーしました！</div>
+
+<script>
+const AUTH_PASS = "hanami364"; // 保護用パスワード
+
+// 指定された商材順序マスター
+const ITEMS = [
+    "ポイ活",
+    "MAX",
+    "ドコモ光",
+    "Home5G",
+    "dバリューパス",
+    "Amazon新規・既存",
+    "あんしん菊",
+    "あんしん蓮",
+    "あんしん薔薇",
+    "プラチナカード",
+    "Goldカード",
+    "Dカード Gold U",
+    "ドコモ電気"
+];
+
+// ポイント換算ルール
+const ITEM_POINTS = {
+    "ポイ活": 1,
+    "MAX": 1,
+    "ドコモ光": 2,
+    "Home5G": 2,
+    "dバリューパス": 1,
+    "Amazon新規・既存": 1,
+    "あんしん菊": 2,
+    "あんしん蓮": 3,
+    "あんしん薔薇": 5,
+    "プラチナカード": 3,
+    "Goldカード": 2,
+    "Dカード Gold U": 1,
+    "ドコモ電気": 2
+};
+
+// メンバーマスター（1ページ目の表示名: 宗廣＝「ム」）
+const ALL_MEMBERS_MASTER = [
+    // 花見川 - 新山口
+    { name: "大熊 百合香", display: "大熊", shortTeam: "大熊", team: "新山口", group: "花見川" },
+    { name: "小山 水華", display: "小山", shortTeam: "大熊", team: "新山口", group: "花見川" },
+    { name: "高橋 ユリ", display: "ゆり", shortTeam: "大熊", team: "新山口", group: "花見川" },
+    { name: "宗廣 風斗", display: "ム", shortTeam: "大熊", team: "新山口", group: "花見川" }, // 日別入力のみ「ム」
+
+    // 花見川 - 髙田WEST
+    { name: "高田 日奈子", display: "髙田", shortTeam: "高田", team: "髙田WEST", group: "花見川" },
+    { name: "岡澤 拓磨", display: "オカ", shortTeam: "高田", team: "髙田WEST", group: "花見川" },
+    { name: "シャンタン スマン", display: "スマン", shortTeam: "高田", team: "髙田WEST", group: "花見川" },
+    { name: "鈴木 環子", display: "鈴木", shortTeam: "高田", team: "髙田WEST", group: "花見川" },
+
+    // 花見川 - サノリーズ
+    { name: "佐野 貴憲", display: "佐野", shortTeam: "佐野", team: "サノリーズ", group: "花見川" },
+    { name: "金城 勝樹", display: "金", shortTeam: "佐野", team: "サノリーズ", group: "花見川" },
+    { name: "三橋 大悟", display: "三橋", shortTeam: "佐野", team: "サノリーズ", group: "花見川" },
+    { name: "高橋 知美", display: "ともみ", shortTeam: "佐野", team: "サノリーズ", group: "花見川" },
+
+    // 花見川 - その他
+    { name: "中村 友和", display: "中村", shortTeam: "中村", team: "その他", group: "花見川" },
+
+    // 八千代組グループ
+    { name: "大熊 達也", display: "AC大熊", shortTeam: "八千代", team: "その他", group: "八千代組" },
+    { name: "柴田 実咲", display: "柴田", shortTeam: "八千代", team: "その他", group: "八千代組" },
+    { name: "花嶋 朱里", display: "花嶋", shortTeam: "八千代", team: "その他", group: "八千代組" }
+];
+
+const FOUR_TEAMS = ["サノリーズ", "新山口", "髙田WEST", "その他"];
+
+const BADGE_CLASSES = { "新山口": "badge-yamaguchi", "髙田WEST": "badge-takada", "サノリーズ": "badge-sano", "その他": "badge-other", "八千代組": "badge-yachiyo" };
+const TEAM_BG_COLORS = { "佐野": "var(--team-sanorリーズ)", "八千代": "var(--team-yachiyo)", "大熊": "var(--team-yamaguchi)", "中村": "var(--team-other)", "高田": "var(--team-takada)" };
+const FOUR_TEAM_COLORS = { "サノリーズ": "var(--team-sanorリーズ-txt)", "新山口": "var(--team-yamaguchi-txt)", "髙田WEST": "var(--team-takada-txt)", "その他": "var(--team-other-txt)" };
+
+let currentDate = new Date().toISOString().split('T')[0];
+let currentMonth = currentDate.substring(0, 7);
+let storeData = { daily: {}, targets: {}, forum: [] };
+let viewMode = 'individual';
+
+let selectedMembersForCompare = ALL_MEMBERS_MASTER.map(m => m.name);
+let selectedItemsForCompare = [...ITEMS];
+
+let mainChartInstance = null;
+let compareChartInstance = null;
+let confettiTriggered = false;
+let prevFlowerTotal = 0;
+let flowerMilestonesShown = new Set();
+
+// 表の行を少しずつ時間差でフェードインさせる演出
+function staggerRows(el) {
+    if (!el) return;
+    Array.from(el.children).forEach((row, i) => {
+        row.style.animationDelay = `${Math.min(i * 0.04, 0.6)}s`;
+    });
+}
+
+// 数字をカウントアップさせながら更新する演出
+function animateCountUp(el, targetValue, duration = 700) {
+    if (!el) return;
+    const startValue = parseFloat(el.dataset.rawValue || el.innerText) || 0;
+    if (startValue === targetValue) { el.innerText = targetValue; return; }
+    const startTime = performance.now();
+    el.dataset.rawValue = targetValue;
+    el.classList.remove('score-pop'); void el.offsetWidth; el.classList.add('score-pop');
+    function step(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(startValue + (targetValue - startValue) * eased);
+        el.innerText = current;
+        if (progress < 1) requestAnimationFrame(step);
+        else el.innerText = targetValue;
+    }
+    requestAnimationFrame(step);
+}
+
+function switchPage(pageId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
+
+    const tabMap = {
+        'entryPage': 0, 'comparePage': 1, 'pointsPage': 2, 'ienakaPage': 3, 'flowerPage': 4, 'forumPage': 5
+    };
+
+    document.querySelectorAll('.tab-btn')[tabMap[pageId]].classList.add('active');
+    document.getElementById(pageId).classList.add('active');
+
+    if (pageId === 'entryPage') { renderUI(); updateMainChart(); }
+    else if (pageId === 'comparePage') { renderComparisonPage(); }
+    else if (pageId === 'pointsPage') { renderPointsPage(); }
+    else if (pageId === 'ienakaPage') { renderIenakaPage(); }
+    else if (pageId === 'flowerPage') { renderFlowerPage(); }
+    else if (pageId === 'forumPage') { renderForumPage(); }
+}
+
+// サーバーからデータ通信・一括読み込み
+async function loadStoreDataFromServer() {
+    try {
+        const res = await fetch('/api/get_all_data');
+        storeData = await res.json();
+        if (!storeData.daily) storeData.daily = {};
+        if (!storeData.targets) storeData.targets = {};
+        if (!storeData.forum) storeData.forum = [];
+        renderUI();
+        updateMainChart();
+    } catch (e) {
+        console.error("サーバー読み込みエラー、ローカルフォールバック実行", e);
+        const local = localStorage.getItem('store_performance_vs_yachiyo_v5');
+        if (local) {
+            try { storeData = JSON.parse(local); } catch (err) {}
+        }
+        renderUI();
+        updateMainChart();
+    }
+}
+
+// サーバーにデータ通信・一括保存（「保存ボタン」またはカウント時に実行）
+async function saveDataToServer() {
+    localStorage.setItem('store_performance_vs_yachiyo_v5', JSON.stringify(storeData));
+    try {
+        const res = await fetch('/api/save_all_data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(storeData)
+        });
+        const result = await res.json();
+        showToastMsg(result.message || "☁️ サーバーへ保存しました");
+        renderUI();
+        updateMainChart();
+    } catch (e) {
+        showToastMsg("⚠️ サーバー接続エラー（ローカル保存完了）");
+        renderUI();
+        updateMainChart();
+    }
+}
+
+document.getElementById('datePicker').value = currentDate;
+document.getElementById('datePicker').addEventListener('change', (e) => {
+    currentDate = e.target.value;
+    renderUI();
+    updateMainChart();
+});
+
+document.getElementById('monthPicker').value = currentMonth;
+document.getElementById('monthPicker').addEventListener('change', (e) => {
+    currentMonth = e.target.value;
+    confettiTriggered = false;
+    prevFlowerTotal = 0;
+    flowerMilestonesShown = new Set();
+    renderComparisonPage();
+    renderPointsPage();
+    renderIenakaPage();
+    renderFlowerPage();
+});
+
+function getDayData(dateStr) {
+    if (!storeData.daily[dateStr]) storeData.daily[dateStr] = {};
+    const dayObj = storeData.daily[dateStr];
+    ITEMS.forEach(item => {
+        if (!dayObj[item]) dayObj[item] = {};
+        ALL_MEMBERS_MASTER.forEach(m => {
+            if (dayObj[item][m.name] === undefined) dayObj[item][m.name] = 0;
+        });
+    });
+    return dayObj;
+}
+
+function calculateMonthlySummary(monthStr) {
+    const daily = storeData.daily;
+    const year = parseInt(monthStr.split('-')[0], 10);
+    const month = parseInt(monthStr.split('-')[1], 10);
+    const totalDaysInMonth = new Date(year, month, 0).getDate();
+    
+    const recordedDates = Object.keys(daily).filter(d => d.startsWith(monthStr) && Object.keys(daily[d]).length > 0);
+    const daysRecorded = recordedDates.length > 0 ? recordedDates.length : 1;
+
+    let totalCounts = {};
+    ITEMS.forEach(item => {
+        totalCounts[item] = {};
+        ALL_MEMBERS_MASTER.forEach(m => { totalCounts[item][m.name] = 0; });
+    });
+
+    recordedDates.forEach(d => {
+        const dayData = daily[d];
+        ITEMS.forEach(item => {
+            if (dayData[item]) {
+                ALL_MEMBERS_MASTER.forEach(m => {
+                    totalCounts[item][m.name] += (dayData[item][m.name] || 0);
+                });
+            }
+        });
+    });
+
+    let forecastCounts = {};
+    ITEMS.forEach(item => {
+        forecastCounts[item] = {};
+        ALL_MEMBERS_MASTER.forEach(m => {
+            const act = totalCounts[item][m.name];
+            forecastCounts[item][m.name] = Math.round((act / daysRecorded) * totalDaysInMonth * 10) / 10;
+        });
+    });
+
+    return { totalCounts, forecastCounts, daysRecorded, totalDaysInMonth };
+}
+
+// ---------------- 1. 入力画面 ----------------
+function renderUI() {
+    const container = document.getElementById('itemsContainer');
+    container.innerHTML = '';
+
+    const dayData = getDayData(currentDate);
+    const monthStr = currentDate.substring(0, 7);
+    const summary = calculateMonthlySummary(monthStr);
+
+    ITEMS.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+
+        let totalAct = 0, totalFcast = 0;
+        ALL_MEMBERS_MASTER.forEach(m => {
+            totalAct += summary.totalCounts[item][m.name] || 0;
+            totalFcast += summary.forecastCounts[item][m.name] || 0;
+        });
+
+        const targetVal = storeData.targets[item] || 0;
+        const actProgress = targetVal > 0 ? ((totalAct / targetVal) * 100).toFixed(1) : '0.0';
+        const fcastProgress = targetVal > 0 ? ((totalFcast / targetVal) * 100).toFixed(1) : '0.0';
+
+        let levelClass = '';
+        let badgeLvlClass = 'lvl-normal';
+
+        if (targetVal > 0) {
+            if (totalAct >= targetVal) {
+                levelClass = 'level-complete';
+                badgeLvlClass = 'lvl-complete';
+            } else {
+                const forecastRate = (totalFcast / targetVal) * 100;
+                if (forecastRate >= 80) { levelClass = 'level-3'; badgeLvlClass = 'lvl-3'; }
+                else if (forecastRate >= 60) { levelClass = 'level-2'; badgeLvlClass = 'lvl-2'; }
+                else if (forecastRate >= 40) { levelClass = 'level-1'; badgeLvlClass = 'lvl-1'; }
+                else { levelClass = 'level-0'; badgeLvlClass = 'lvl-0'; }
+            }
+        }
+
+        if (levelClass) card.classList.add(levelClass);
+
+        const header = document.createElement('div');
+        header.className = 'item-header';
+        header.innerHTML = `
+            <span class="item-title">${item}</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span class="progress-badge ${badgeLvlClass}">
+                    🎯 目標: ${targetVal} | 📊 実績: ${totalAct} (${actProgress}%) | 🔮 着地見込み: ${Math.round(totalFcast)} (${fcastProgress}%)
+                </span>
+                <button class="btn-clear-item" onclick="clearItemData('${item}')" title="この商材の本日データをリセット">🗑 リセット</button>
+            </div>
+        `;
+        card.appendChild(header);
+
+        const row = document.createElement('div');
+        row.className = 'members-row';
+
+        if (viewMode === 'individual') {
+            ALL_MEMBERS_MASTER.forEach(m => {
+                const count = dayData[item][m.name] || 0;
+                const badge = createBadge(m.display, m.name, count, m.team, (newVal) => {
+                    storeData.daily[currentDate][item][m.name] = newVal;
+                    saveDataToServer(); // 自動保存
+                });
+                row.appendChild(badge);
+            });
+        } else {
+            let hanaSum = ALL_MEMBERS_MASTER.filter(m => m.group === "花見川").reduce((acc, m) => acc + (dayData[item][m.name] || 0), 0);
+            let yachiSum = ALL_MEMBERS_MASTER.filter(m => m.group === "八千代組").reduce((acc, m) => acc + (dayData[item][m.name] || 0), 0);
+
+            row.appendChild(createGroupBadge("花見川チーム", hanaSum, "badge-yamaguchi"));
+            row.appendChild(createGroupBadge("八千代組", yachiSum, "badge-yachiyo"));
+        }
+
+        card.appendChild(row);
+        container.appendChild(card);
+    });
+}
+
+function createBadge(displayName, fullName, count, teamName, onChange) {
+    const btn = document.createElement('div');
+    btn.className = `member-badge ${BADGE_CLASSES[teamName]}`;
+    btn.innerHTML = `<span>${displayName}</span> <span class="count-val">${count}</span>`;
+
+    let timer = null, isLongPress = false;
+    const startPress = () => {
+        isLongPress = false;
+        timer = setTimeout(() => {
+            isLongPress = true;
+            if (confirm(`【確認】\n${fullName} さんの「${count}」を 0 にリセットしますか？`)) onChange(0);
+        }, 700);
+    };
+
+    btn.addEventListener('mousedown', startPress);
+    btn.addEventListener('mouseup', () => { clearTimeout(timer); if (!isLongPress) onChange(count + 1); });
+    btn.addEventListener('touchstart', startPress, { passive: true });
+    btn.addEventListener('touchend', (e) => { clearTimeout(timer); if (!isLongPress) { e.preventDefault(); onChange(count + 1); } });
+
+    return btn;
+}
+
+function createGroupBadge(groupName, count, badgeClass) {
+    const btn = document.createElement('div');
+    btn.className = `member-badge ${badgeClass}`;
+    btn.style.cursor = 'default';
+    btn.innerHTML = `<span>${groupName}</span> <span class="count-val">${count}</span>`;
+    return btn;
+}
+
+function toggleView() {
+    viewMode = viewMode === 'individual' ? 'team' : 'individual';
+    document.getElementById('viewToggleBtn').innerText = `👀 表示切り替え: ${viewMode === 'individual' ? '個人別' : '花見川 VS 八千代'}`;
+    renderUI();
+}
+
+function updateMainChart() {
+    const showForecast = document.getElementById('forecastToggle').checked;
+    const summary = calculateMonthlySummary(currentDate.substring(0, 7));
+    
+    let targetData = [];
+    let hanamigawaActuals = [], yachiyoActuals = [];
+    let hanamigawaForecasts = [], yachiyoForecasts = [];
+
+    ITEMS.forEach(item => {
+        let hanaAct = 0, hanaFcast = 0;
+        let yachiAct = 0, yachiFcast = 0;
+
+        ALL_MEMBERS_MASTER.forEach(m => {
+            const act = summary.totalCounts[item][m.name] || 0;
+            const fcast = summary.forecastCounts[item][m.name] || 0;
+
+            if (m.group === "花見川") { hanaAct += act; hanaFcast += fcast; }
+            else { yachiAct += act; yachiFcast += fcast; }
+        });
+
+        hanamigawaActuals.push(hanaAct); yachiyoActuals.push(yachiAct);
+        hanamigawaForecasts.push(hanaFcast); yachiyoForecasts.push(yachiFcast);
+
+        targetData.push(storeData.targets[item] || 0);
+    });
+
+    const datasets = [
+        { type: 'line', label: '🎯 目標数値', data: targetData, borderColor: '#f59e0b', borderWidth: 3, fill: false },
+        { label: '花見川チーム (実績)', data: hanamigawaActuals, backgroundColor: '#2563eb' },
+        { label: '八千代組 (実績)', data: yachiyoActuals, backgroundColor: '#ef4444' }
+    ];
+
+    if (showForecast) {
+        datasets.push({ label: '花見川チーム (着地見込み)', data: hanamigawaForecasts, backgroundColor: 'rgba(37, 99, 235, 0.3)', borderColor: '#2563eb', borderWidth: 1 });
+        datasets.push({ label: '八千代組 (着地見込み)', data: yachiyoForecasts, backgroundColor: 'rgba(239, 68, 68, 0.3)', borderColor: '#ef4444', borderWidth: 1 });
+    }
+
+    const ctx = document.getElementById('summaryChart').getContext('2d');
+    if (mainChartInstance) mainChartInstance.destroy();
+
+    mainChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: ITEMS, datasets: datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+
+// ---------------- 2. 個人比較分析 ----------------
+function renderComparisonPage() {
+    renderMemberCheckboxes();
+    renderItemCheckboxes();
+    renderComparisonTable();
+    updateCompareChart();
+}
+
+function renderMemberCheckboxes() {
+    const container = document.getElementById('memberCheckboxes');
+    container.innerHTML = '';
+
+    ALL_MEMBERS_MASTER.forEach(m => {
+        const isChecked = selectedMembersForCompare.includes(m.name);
+        const label = document.createElement('label');
+        label.className = `member-badge ${BADGE_CLASSES[m.team]}`;
+        label.style.cursor = 'pointer';
+        label.innerHTML = `
+            <input type="checkbox" value="${m.name}" ${isChecked ? 'checked' : ''} onchange="toggleMemberSelection('${m.name}')" style="display:none;">
+            ${m.name}
+        `;
+        if (isChecked) {
+            label.style.border = '2px solid #0f172a';
+            label.style.boxShadow = '0 4px 10px rgba(0,0,0,0.15)';
+        }
+        container.appendChild(label);
+    });
+}
+
+function toggleMemberSelection(memberName) {
+    if (selectedMembersForCompare.includes(memberName)) {
+        selectedMembersForCompare = selectedMembersForCompare.filter(m => m !== memberName);
+    } else {
+        selectedMembersForCompare.push(memberName);
+    }
+    renderComparisonPage();
+}
+
+function selectAllMembers(status) {
+    selectedMembersForCompare = status ? ALL_MEMBERS_MASTER.map(m => m.name) : [];
+    renderComparisonPage();
+}
+
+function renderItemCheckboxes() {
+    const container = document.getElementById('itemCheckboxes');
+    container.innerHTML = '';
+
+    ITEMS.forEach(item => {
+        const isChecked = selectedItemsForCompare.includes(item);
+        const label = document.createElement('label');
+        label.className = 'member-badge';
+        label.style.cursor = 'pointer';
+        label.style.background = isChecked ? '#dbeafe' : '#f1f5f9';
+        label.style.color = isChecked ? '#1e40af' : '#64748b';
+        label.style.borderColor = isChecked ? '#93c5fd' : '#cbd5e1';
+
+        label.innerHTML = `
+            <input type="checkbox" value="${item}" ${isChecked ? 'checked' : ''} onchange="toggleItemSelection('${item}')" style="display:none;">
+            ${item}
+        `;
+        container.appendChild(label);
+    });
+}
+
+function toggleItemSelection(itemName) {
+    if (selectedItemsForCompare.includes(itemName)) {
+        selectedItemsForCompare = selectedItemsForCompare.filter(i => i !== itemName);
+    } else {
+        selectedItemsForCompare.push(itemName);
+    }
+    renderComparisonTable();
+    updateCompareChart();
+}
+
+function selectAllItems(status) {
+    selectedItemsForCompare = status ? [...ITEMS] : [];
+    renderComparisonPage();
+}
+
+function renderComparisonTable() {
+    const dataType = document.getElementById('dataTypeSelect').value;
+    const summary = calculateMonthlySummary(currentMonth);
+    const dataSet = dataType === 'actual' ? summary.totalCounts : summary.forecastCounts;
+
+    const tableHeader = document.getElementById('tableHeader');
+    const tableBody = document.getElementById('tableBody');
+
+    let headerHTML = '<th>商材／項目</th>';
+    selectedMembersForCompare.forEach(name => { headerHTML += `<th>${name}</th>`; });
+    headerHTML += '<th>選択合計</th>';
+    tableHeader.innerHTML = headerHTML;
+
+    let bodyHTML = '';
+    let colTotals = new Array(selectedMembersForCompare.length).fill(0);
+    let grandTotal = 0;
+
+    selectedItemsForCompare.forEach(item => {
+        let rowHTML = `<td><b>${item}</b></td>`;
+        let rowSum = 0;
+
+        selectedMembersForCompare.forEach((memberName, idx) => {
+            const val = (dataSet[item] && dataSet[item][memberName]) || 0;
+            rowSum += val;
+            colTotals[idx] += val;
+            rowHTML += `<td>${val}</td>`;
+        });
+
+        grandTotal += rowSum;
+        rowHTML += `<td><b style="color:var(--accent-blue);">${Math.round(rowSum * 10) / 10}</b></td>`;
+        bodyHTML += `<tr>${rowHTML}</tr>`;
+    });
+
+    let totalRowHTML = '<tr class="total-row"><td><b>総合件数</b></td>';
+    colTotals.forEach(val => { totalRowHTML += `<td><b>${Math.round(val * 10) / 10}</b></td>`; });
+    totalRowHTML += `<td><b style="color:var(--team-yachiyo-txt); font-size:16px;">${Math.round(grandTotal * 10) / 10}</b></td></tr>`;
+
+    tableBody.innerHTML = bodyHTML + totalRowHTML;
+    staggerRows(tableBody);
+}
+
+function updateCompareChart() {
+    const dataType = document.getElementById('dataTypeSelect').value;
+    const summary = calculateMonthlySummary(currentMonth);
+    const dataSet = dataType === 'actual' ? summary.totalCounts : summary.forecastCounts;
+
+    const colors = ['#2563eb', '#ef4444', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#14b8a6'];
+
+    const datasets = selectedMembersForCompare.map((memberName, idx) => {
+        const memberData = selectedItemsForCompare.map(item => (dataSet[item] && dataSet[item][memberName]) || 0);
+        return { label: memberName, data: memberData, backgroundColor: colors[idx % colors.length] };
+    });
+
+    const ctx = document.getElementById('compareChart').getContext('2d');
+    if (compareChartInstance) compareChartInstance.destroy();
+
+    compareChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: selectedItemsForCompare, datasets: datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+
+// ---------------- 3. 花見川 VS 八千代組 チーム点数対抗 ----------------
+function renderPointsPage() {
+    const summary = calculateMonthlySummary(currentMonth);
+    const totals = summary.totalCounts;
+
+    let scoreHanamigawa = 0;
+    let scoreYachiyo = 0;
+    let memberScores = {};
+
+    ALL_MEMBERS_MASTER.forEach(m => { memberScores[m.name] = 0; });
+
+    ITEMS.forEach(item => {
+        const pts = ITEM_POINTS[item] || 1;
+        ALL_MEMBERS_MASTER.forEach(m => {
+            const count = (totals[item] && totals[item][m.name]) || 0;
+            const points = count * pts;
+            memberScores[m.name] += points;
+
+            if (m.group === "花見川") scoreHanamigawa += points;
+            else scoreYachiyo += points;
+        });
+    });
+
+    animateCountUp(document.getElementById('scoreHanamigawa'), scoreHanamigawa);
+    animateCountUp(document.getElementById('scoreYachiyo'), scoreYachiyo);
+
+    const cardH = document.getElementById('teamHanamigawaCard');
+    const cardY = document.getElementById('teamYachiyoCard');
+
+    cardH.classList.remove('winner');
+    cardY.classList.remove('winner');
+
+    if (scoreHanamigawa > scoreYachiyo) {
+        cardH.classList.add('winner');
+        triggerConfetti();
+    } else if (scoreYachiyo > scoreHanamigawa) {
+        cardY.classList.add('winner');
+        triggerConfetti();
+    }
+
+    const header = document.getElementById('pointsTableHeader');
+    const body = document.getElementById('pointsTableBody');
+
+    header.innerHTML = '<th>順位</th><th>メンバー名</th><th>所属グループ</th><th>獲得総点数</th>';
+    let bodyHTML = '';
+    const sortedMembers = [...ALL_MEMBERS_MASTER].sort((a, b) => memberScores[b.name] - memberScores[a.name]);
+
+    sortedMembers.forEach((m, idx) => {
+        const groupColor = m.group === "花見川" ? "color:var(--team-hanamigawa);" : "color:var(--team-yachiyo-txt);";
+        bodyHTML += `
+            <tr>
+                <td><b>${idx + 1}位</b></td>
+                <td><b>${m.name}</b></td>
+                <td style="${groupColor} font-weight:800;">${m.group} (${m.team})</td>
+                <td><b style="font-size:15px; color:var(--accent-gold);">${memberScores[m.name]} 点</b></td>
+            </tr>
+        `;
+    });
+
+    body.innerHTML = bodyHTML;
+    staggerRows(body);
+}
+
+// ---------------- 4. イエナカ進捗表 (4チーム対抗) ----------------
+function renderIenakaPage() {
+    const summary = calculateMonthlySummary(currentMonth);
+    const totals = summary.totalCounts;
+    const ienakaItems = ["Home5G", "ドコモ光", "ドコモ電気"];
+
+    let teamIenakaSum = { "サノリーズ": 0, "新山口": 0, "髙田WEST": 0, "その他": 0 };
+    let memberIenakaData = {};
+
+    ALL_MEMBERS_MASTER.forEach(m => {
+        memberIenakaData[m.name] = { "Home5G": 0, "ドコモ光": 0, "ドコモ電気": 0, total: 0 };
+    });
+
+    ienakaItems.forEach(item => {
+        ALL_MEMBERS_MASTER.forEach(m => {
+            const count = (totals[item] && totals[item][m.name]) || 0;
+            memberIenakaData[m.name][item] += count;
+            memberIenakaData[m.name].total += count;
+
+            if (teamIenakaSum[m.team] !== undefined) {
+                teamIenakaSum[m.team] += count;
+            }
+        });
+    });
+
+    const grid = document.getElementById('ienaka4TeamsGrid');
+    grid.innerHTML = '';
+    let maxIenaka = Math.max(...Object.values(teamIenakaSum));
+
+    FOUR_TEAMS.forEach(tName => {
+        const sum = teamIenakaSum[tName];
+        const isWinner = sum > 0 && sum === maxIenaka;
+        const card = document.createElement('div');
+        card.className = `team-mini-card ${isWinner ? 'winner' : ''}`;
+        card.innerHTML = `
+            ${isWinner ? '<div class="trophy-banner">1位</div><div class="winner-crown">👑</div>' : ''}
+            <div class="team-mini-name" style="color:${FOUR_TEAM_COLORS[tName]}">${tName}</div>
+            <div class="team-mini-score" style="color:${FOUR_TEAM_COLORS[tName]}">${sum} <span style="font-size:14px;">件</span></div>
+            <div style="font-size:10px; font-weight:800; color:var(--text-muted);">イエナカ合計件数</div>
+        `;
+        grid.appendChild(card);
+    });
+    staggerRows(grid);
+
+    const body = document.getElementById('ienakaTableBody');
+    let bodyHTML = '';
+    const sorted = [...ALL_MEMBERS_MASTER].sort((a, b) => memberIenakaData[b.name].total - memberIenakaData[a.name].total);
+
+    sorted.forEach(m => {
+        const d = memberIenakaData[m.name];
+        bodyHTML += `
+            <tr>
+                <td><b>${m.name}</b></td>
+                <td style="color:${FOUR_TEAM_COLORS[m.team]}; font-weight:800;">${m.team}</td>
+                <td>${d["Home5G"]}</td>
+                <td>${d["ドコモ光"]}</td>
+                <td>${d["ドコモ電気"]}</td>
+                <td><b style="color:var(--accent-blue);">${d.total} 件</b></td>
+            </tr>
+        `;
+    });
+
+    body.innerHTML = bodyHTML;
+    staggerRows(body);
+}
+
+// ---------------- 5. 菊・蓮・薔薇イベント画面 (Excelデザイン再現) ----------------
+function renderFlowerPage() {
+    const summary = calculateMonthlySummary(currentMonth);
+    const totals = summary.totalCounts;
+
+    let totalKiku = 0, totalHasu = 0, totalBara = 0;
+    let memberFlowerData = {};
+    let teamFlowerSummary = {};
+
+    ALL_MEMBERS_MASTER.forEach(m => {
+        const kiku = (totals["あんしん菊"] && totals["あんしん菊"][m.name]) || 0;
+        const hasu = (totals["あんしん蓮"] && totals["あんしん蓮"][m.name]) || 0;
+        const bara = (totals["あんしん薔薇"] && totals["あんしん薔薇"][m.name]) || 0;
+
+        totalKiku += kiku;
+        totalHasu += hasu;
+        totalBara += bara;
+
+        const pts = (kiku * 2) + (hasu * 3) + (bara * 5);
+        memberFlowerData[m.name] = { kiku, hasu, bara, pts };
+
+        if (!teamFlowerSummary[m.shortTeam]) {
+            teamFlowerSummary[m.shortTeam] = { kiku: 0, hasu: 0, bara: 0, pts: 0 };
+        }
+        teamFlowerSummary[m.shortTeam].kiku += kiku;
+        teamFlowerSummary[m.shortTeam].hasu += hasu;
+        teamFlowerSummary[m.shortTeam].bara += bara;
+        teamFlowerSummary[m.shortTeam].pts += pts;
+    });
+
+    const totalFlowerCount = totalKiku + totalHasu + totalBara;
+    const progressRate = Math.min(100, Math.round((totalFlowerCount / 100) * 100));
+
+    document.getElementById('flowerProgressBar').style.width = `${progressRate}%`;
+    document.getElementById('flowerProgressText').innerText = `${totalFlowerCount} / 100件 (${progressRate}%)`;
+
+    renderSparkleLayer();
+
+    const canvas = document.getElementById('flowerGardenCanvas');
+    canvas.innerHTML = '';
+    canvas.classList.toggle('blooming', totalFlowerCount > 0);
+
+    if (totalFlowerCount === 0) {
+        canvas.innerHTML = '<div style="color:var(--text-muted); font-size:12px; padding:15px;">菊・蓮・薔薇が成約されると、ここに花が咲き始めます🌸</div>';
+    } else {
+        let flowerIdx = 0;
+        const flowerDelay = () => `style="animation-delay:${Math.min(flowerIdx++ * 0.03, 1.2)}s, ${0.3 + Math.min(flowerIdx * 0.03, 1.2)}s"`;
+        for (let i = 0; i < totalKiku; i++) canvas.innerHTML += `<span class="flower-icon" title="菊" ${flowerDelay()}>🌼</span>`;
+        for (let i = 0; i < totalHasu; i++) canvas.innerHTML += `<span class="flower-icon" title="蓮" ${flowerDelay()}>🪷</span>`;
+        for (let i = 0; i < totalBara; i++) canvas.innerHTML += `<span class="flower-icon" title="薔薇" ${flowerDelay()}>🌹</span>`;
+    }
+
+    if (totalFlowerCount > prevFlowerTotal) {
+        burstFlowerParticles(Math.min(totalFlowerCount - prevFlowerTotal, 6));
+    }
+    [25, 50, 75].forEach(milestone => {
+        if (progressRate >= milestone && !flowerMilestonesShown.has(milestone)) {
+            flowerMilestonesShown.add(milestone);
+            burstFlowerParticles(10);
+        }
+    });
+    prevFlowerTotal = totalFlowerCount;
+
+    if (totalFlowerCount >= 100) triggerConfetti();
+
+    // 個人進捗表
+    const indBody = document.getElementById('eventIndividualTableBody');
+    let indHTML = '';
+    const sortedMembers = [...ALL_MEMBERS_MASTER].sort((a, b) => memberFlowerData[b.name].pts - memberFlowerData[a.name].pts);
+
+    sortedMembers.forEach(m => {
+        const d = memberFlowerData[m.name];
+        const bgColor = TEAM_BG_COLORS[m.shortTeam] || '#fff';
+        indHTML += `
+            <tr>
+                <td style="background-color:${bgColor};">${m.shortTeam}</td>
+                <td>${m.name}</td>
+                <td>${d.kiku}</td>
+                <td>${d.hasu}</td>
+                <td>${d.bara}</td>
+                <td class="td-pts">${d.pts}</td>
+            </tr>
+        `;
+    });
+    indBody.innerHTML = indHTML;
+    staggerRows(indBody);
+
+    // チーム進捗表
+    const teamBody = document.getElementById('eventTeamTableBody');
+    let teamHTML = '';
+    const eventTeamList = ["佐野", "大熊", "高田", "八千代", "中村"];
+
+    eventTeamList.forEach(tKey => {
+        const d = teamFlowerSummary[tKey] || { kiku: 0, hasu: 0, bara: 0, pts: 0 };
+        const bgColor = TEAM_BG_COLORS[tKey] || '#fff';
+        teamHTML += `
+            <tr>
+                <td style="background-color:${bgColor};">${tKey}</td>
+                <td>${d.kiku}</td>
+                <td>${d.hasu}</td>
+                <td>${d.bara}</td>
+                <td class="td-pts">${d.pts}</td>
+            </tr>
+        `;
+    });
+    teamBody.innerHTML = teamHTML;
+    staggerRows(teamBody);
+}
+
+// ---------------- 6. みんなのご意見箱 ----------------
+function renderForumPage() {
+    const container = document.getElementById('forumListContainer');
+    container.innerHTML = '';
+
+    if (!storeData.forum || storeData.forum.length === 0) {
+        container.innerHTML = '<div style="color:var(--text-muted); font-size:12px; text-align:center; padding:20px;">まだ投稿がありません。最初のご意見を投稿してみましょう！</div>';
+        return;
+    }
+
+    [...storeData.forum].reverse().forEach((post) => {
+        const card = document.createElement('div');
+        card.className = 'forum-post';
+        card.innerHTML = `
+            <div class="forum-post-header">
+                <span>👤 投稿者: ${post.name}</span>
+                <span>📅 ${post.date}</span>
+            </div>
+            <div style="font-size:13px; font-weight:700; color:var(--text-main); white-space:pre-wrap;">${post.text}</div>
+        `;
+        container.appendChild(card);
+    });
+    staggerRows(container);
+}
+
+function submitForumPost() {
+    const nameInput = document.getElementById('forumNameInput');
+    const textInput = document.getElementById('forumTextInput');
+
+    const name = nameInput.value.trim() || '匿名';
+    const text = textInput.value.trim();
+
+    if (!text) {
+        alert("要件・ご意見内容を入力してください。");
+        return;
+    }
+
+    const newPost = {
+        id: Date.now(),
+        name: name,
+        text: text,
+        date: new Date().toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+    };
+
+    if (!storeData.forum) storeData.forum = [];
+    storeData.forum.push(newPost);
+
+    saveDataToServer();
+    textInput.value = '';
+    showToastMsg("✉️ 掲示板にご意見を投稿しました！");
+    renderForumPage();
+}
+
+function triggerConfetti() {
+    if (confettiTriggered) return;
+    confettiTriggered = true;
+    if (typeof confetti === 'function') {
+        confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 } });
+        setTimeout(() => {
+            confetti({ particleCount: 80, angle: 60, spread: 80, origin: { x: 0 } });
+            confetti({ particleCount: 80, angle: 120, spread: 80, origin: { x: 1 } });
+        }, 300);
+    }
+}
+
+function renderSparkleLayer() {
+    const layer = document.getElementById('sparkleLayer');
+    if (!layer || layer.dataset.built === '1') return;
+    layer.dataset.built = '1';
+    const emojis = ['✨', '🌟', '💫', '⭐'];
+    let html = '';
+    for (let i = 0; i < 16; i++) {
+        const left = Math.random() * 96;
+        const duration = (5 + Math.random() * 4).toFixed(2);
+        const delay = (Math.random() * 8).toFixed(2);
+        const drift = Math.round(10 + Math.random() * 30);
+        const size = (12 + Math.random() * 10).toFixed(0);
+        const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+        html += `<span class="sparkle" style="left:${left}%; font-size:${size}px; --drift:${drift}px; animation-duration:${duration}s; animation-delay:${delay}s;">${emoji}</span>`;
+    }
+    layer.innerHTML = html;
+}
+
+function burstFlowerParticles(count) {
+    if (typeof confetti !== 'function') return;
+    const wrap = document.getElementById('flowerBoxWrap');
+    if (!wrap) return;
+    const rect = wrap.getBoundingClientRect();
+    if (rect.width === 0 && rect.height === 0) return;
+    const originX = (rect.left + rect.width / 2) / window.innerWidth;
+    const originY = (rect.top + rect.height / 2) / window.innerHeight;
+    confetti({
+        particleCount: 12 + count * 3,
+        spread: 70,
+        startVelocity: 22,
+        gravity: 0.6,
+        scalar: 0.7,
+        colors: ['#34d399', '#f472b6', '#facc15', '#fb7185'],
+        origin: { x: originX, y: originY }
+    });
+}
+
+// 画像コピー機能
+function setupChartCopy(wrapId, chartInstanceGetter) {
+    const wrap = document.getElementById(wrapId);
+    let timer = null;
+    const copyImage = async () => {
+        const chart = chartInstanceGetter();
+        if (!chart) return;
+        try {
+            const url = chart.toBase64Image();
+            const res = await fetch(url);
+            const blob = await res.blob();
+            await navigator.clipboard.write([ new ClipboardItem({ 'image/png': blob }) ]);
+            showToastMsg("📋 グラフ画像をコピーしました！");
+        } catch (err) { alert("画像コピーに対応していないブラウザです。"); }
+    };
+    wrap.addEventListener('mousedown', () => { timer = setTimeout(copyImage, 800); });
+    wrap.addEventListener('mouseup', () => clearTimeout(timer));
+    wrap.addEventListener('touchstart', () => { timer = setTimeout(copyImage, 800); }, { passive: true });
+    wrap.addEventListener('touchend', () => clearTimeout(timer));
+}
+
+function setupArenaCopy(wrapId) {
+    const wrap = document.getElementById(wrapId);
+    let timer = null;
+    const copyAreaImage = async () => {
+        if (!wrap) return;
+        try {
+            const canvas = await html2canvas(wrap, { backgroundColor: '#ffffff', scale: 2 });
+            canvas.toBlob(async (blob) => {
+                if (blob) {
+                    await navigator.clipboard.write([ new ClipboardItem({ 'image/png': blob }) ]);
+                    showToastMsg("📋 領域画像をコピーしました！");
+                }
+            });
+        } catch (err) { alert("画像コピーに対応していないブラウザです。"); }
+    };
+    wrap.addEventListener('mousedown', () => { timer = setTimeout(copyAreaImage, 800); });
+    wrap.addEventListener('mouseup', () => clearTimeout(timer));
+    wrap.addEventListener('touchstart', () => { timer = setTimeout(copyAreaImage, 800); }, { passive: true });
+    wrap.addEventListener('touchend', () => clearTimeout(timer));
+}
+
+function showToastMsg(msg) {
+    const toast = document.getElementById('copyToast');
+    toast.innerText = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function openTargetModal() {
+    const container = document.getElementById('targetInputs');
+    container.innerHTML = '';
+    ITEMS.forEach(item => {
+        const val = storeData.targets[item] || 0;
+        container.innerHTML += `
+            <div class="target-input-group">
+                <span>${item}</span>
+                <input type="number" id="target_${item}" value="${val}" min="0">
+            </div>
+        `;
+    });
+    document.getElementById('targetModal').style.display = 'flex';
+}
+
+function closeTargetModal() { document.getElementById('targetModal').style.display = 'none'; }
+function saveTargets() {
+    ITEMS.forEach(item => {
+        const input = document.getElementById(`target_${item}`);
+        if (input) storeData.targets[item] = parseInt(input.value, 10) || 0;
+    });
+    saveDataToServer();
+    closeTargetModal();
+}
+
+// 🔒 削除機能ロジック（パスワード認証: hanami364）
+
+// 1. 本日データ削除
+function clearCurrentDateData() {
+    const pass = prompt(`⚠️ [${currentDate}] の入力データをリセットします。\nパスワードを入力してください:`);
+    if (pass === null) return;
+    if (pass === AUTH_PASS) {
+        if (confirm(`本当に [${currentDate}] のデータを消去しますか？`)) {
+            delete storeData.daily[currentDate];
+            saveDataToServer();
+            showToastMsg(`🗑 [${currentDate}] のデータを削除しました`);
+        }
+    } else {
+        alert("❌ パスワードが違います。");
+    }
+}
+
+// 2. 商材ごとの本日データ削除
+function clearItemData(item) {
+    const pass = prompt(`⚠️ [${currentDate}] の「${item}」データだけをリセットします。\nパスワードを入力してください:`);
+    if (pass === null) return;
+    if (pass === AUTH_PASS) {
+        if (storeData.daily[currentDate] && storeData.daily[currentDate][item]) {
+            delete storeData.daily[currentDate][item];
+            saveDataToServer();
+            showToastMsg(`🗑 「${item}」の本日データを削除しました`);
+        }
+    } else {
+        alert("❌ パスワードが違います。");
+    }
+}
+
+// 3. 全データ初期化
+function clearAllData() {
+    const pass = prompt("⚠️ 【警告】すべてのデータ（全日程・目標・掲示板）を初期化します。\nパスワードを入力してください:");
+    if (pass === null) return;
+    if (pass === AUTH_PASS) {
+        if (confirm("⚠️ 【最終確認】本当に全データを初期化しますか？この操作は取り消せません。")) {
+            storeData = { daily: {}, targets: {}, forum: [] };
+            saveDataToServer();
+            showToastMsg("🗑 全データを削除しました");
+        }
+    } else {
+        alert("❌ パスワードが違います。");
+    }
+}
+
+// 初期化起動
+loadStoreDataFromServer();
+
+setupChartCopy('mainChartWrap', () => mainChartInstance);
+setupChartCopy('compareChartWrap', () => compareChartInstance);
+setupArenaCopy('pointsArenaWrap');
+setupArenaCopy('ienakaArenaWrap');
+setupArenaCopy('flowerBoxWrap');
+setupArenaCopy('eventIndividualTableWrap');
+setupArenaCopy('eventTeamTableWrap');
+</script>
+</body>
+</html>
