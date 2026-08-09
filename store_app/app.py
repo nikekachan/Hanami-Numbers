@@ -1,38 +1,47 @@
 from flask import Flask, render_template, request, jsonify
-import json
-import os
+import requests
 
 app = Flask(__name__)
-DATA_FILE = 'data.json'
 
-# サーバー上のデータファイルを読み込む
+# JSONBin（永久保存用データベース）情報
+BIN_ID = '6a77edbeda38895dfecbdb48'
+API_KEY = '$2a$10$92xqDnm1PpFIMdMZAQN4ruvsIahgOinrURJkZVdAW.ErjgBSWysYG'
+
+JSONBIN_URL = f'https://api.jsonbin.io/v3/b/{BIN_ID}'
+HEADERS = {
+    'Content-Type': 'application/json',
+    'X-Master-Key': API_KEY
+}
+
 def load_data():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
+    try:
+        res = requests.get(f'{JSONBIN_URL}/latest', headers=HEADERS)
+        if res.status_code == 200:
+            return res.json().get('record', {"daily": {}, "targets": {}, "forum": []})
+    except Exception as e:
+        print("Load Error:", e)
     return {"daily": {}, "targets": {}, "forum": []}
 
-# サーバー上にデータファイルを書き込む
 def save_data(data):
-    with open(DATA_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    try:
+        requests.put(JSONBIN_URL, headers=HEADERS, json=data)
+    except Exception as e:
+        print("Save Error:", e)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# 全端末共有用データ取得API
 @app.route('/api/get_all_data', methods=['GET'])
 def get_all_data():
     return jsonify(load_data())
 
-# 全端末共有用データ一括保存API
 @app.route('/api/save_all_data', methods=['POST'])
 def save_all_data():
     try:
         data = request.json
         save_data(data)
-        return jsonify({"status": "success", "message": "☁️ サーバーへ正常に保存されました！"})
+        return jsonify({"status": "success", "message": "☁️ 保管庫へ正常保存されました！"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
