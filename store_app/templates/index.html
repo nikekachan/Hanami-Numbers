@@ -20,11 +20,11 @@
             --text-main: #0f172a;
             --text-muted: #64748b;
             --accent-blue: #2563eb;
-            --accent-green: #16a34a;
             --accent-gold: #f59e0b;
             --accent-pink: #ec4899;
+            --accent-green: #10b981;
             
-            /* チームカラー設定 */
+            /* チームカラー */
             --team-hanamigawa: #2563eb;
             --team-hanamigawa-bg: #eff6ff;
             --team-yachiyo: #ef4444;
@@ -69,26 +69,16 @@
 
         .nav-tabs { display: flex; gap: 6px; background: #f1f5f9; padding: 5px; border-radius: 14px; flex-wrap: wrap; width: 100%; }
         @media (min-width: 768px) { .nav-tabs { width: auto; } }
-        .tab-btn { flex: 1; text-align: center; padding: 9px 12px; font-size: 13px; font-weight: 800; border: none; border-radius: 10px; background: transparent; color: var(--text-muted); cursor: pointer; transition: transform 0.15s ease, background 0.2s, color 0.2s, box-shadow 0.2s; white-space: nowrap; }
+        .tab-btn { flex: 1; text-align: center; padding: 9px 12px; font-size: 13px; font-weight: 800; border: none; border-radius: 10px; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s; white-space: nowrap; }
         .tab-btn:hover { color: var(--accent-blue); transform: translateY(-1px); }
-        .tab-btn:active { transform: scale(0.94); }
-        .tab-btn.active { background: var(--panel-bg); color: var(--accent-blue); box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+        .tab-btn.active { background: var(--panel-bg); color: var(--accent-blue); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
         .page-content { display: none; }
-        .page-content.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(14px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .page-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 汎用アニメーション */
-        @keyframes cardPopIn { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        @keyframes rowIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes winnerGlow { 0%, 100% { box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25); } 50% { box-shadow: 0 12px 32px rgba(245, 158, 11, 0.55); } }
-        @keyframes crownBounce { 0%, 100% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-4px) rotate(-6deg); } 75% { transform: translateY(-2px) rotate(6deg); } }
-        @keyframes vsPulse { from { transform: scale(1); filter: drop-shadow(0 0 0 rgba(245, 158, 11, 0)); } to { transform: scale(1.12); filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5)); } }
-        @keyframes scorePop { 0% { transform: scale(1); } 35% { transform: scale(1.35); } 60% { transform: scale(0.95); } 100% { transform: scale(1); } }
-        @keyframes floatFlower { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-4px) rotate(6deg); } }
-        @keyframes shimmerStripes { from { background-position: 0 0; } to { background-position: 40px 0; } }
         @keyframes brandShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        @keyframes toastBounceIn { 0% { transform: translateX(-50%) translateY(100px) scale(0.9); opacity: 0; } 60% { transform: translateX(-50%) translateY(-6px) scale(1.03); opacity: 1; } 100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; } }
+        @keyframes rowIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
         .glass-panel { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; padding: 18px; margin-bottom: 18px; box-shadow: var(--shadow-card); }
         .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
@@ -99,25 +89,23 @@
 
         .btn { padding: 9px 15px; font-size: 13px; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
-        .btn:active { transform: translateY(0) scale(0.95); box-shadow: none; }
         .btn-style { background: #0f172a; color: #fff; }
-        .btn-save { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
         .btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
         .btn-pink { background: linear-gradient(135deg, #ec4899, #db2777); color: #fff; }
+        .btn-green { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
         .btn-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
         .btn-danger-all { background: #dc2626; color: #fff; margin-left: auto; }
 
-        .toggle-wrapper { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 6px 14px; border-radius: 30px; }
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .toggle-wrapper { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 6px 12px; border-radius: 30px; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: #fff; transition: .3s; border-radius: 50%; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 22px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: #fff; transition: .3s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent-blue); }
-        input:checked + .slider:before { transform: translateX(20px); }
+        input:checked + .slider:before { transform: translateX(18px); }
 
         /* 商材カード */
-        .item-card { background: #fff; border: 2px solid var(--panel-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-card); transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s, border-color 0.3s; }
-        .item-card:hover { transform: translateY(-3px); box-shadow: 0 14px 26px -6px rgba(0,0,0,0.12); }
+        .item-card { background: #fff; border: 2px solid var(--panel-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-card); transition: all 0.3s; }
         .item-card.level-0 { background: #fef2f2; border-color: #fca5a5; }
         .item-card.level-1 { background: #f6fbf7; border-color: #d1fae5; }
         .item-card.level-2 { background: #ecfdf5; border-color: #a7f3d0; }
@@ -134,7 +122,6 @@
         .progress-badge.lvl-complete { background: #dbeafe; color: #1e40af; }
         .progress-badge.lvl-normal { background: #f0f9ff; color: #0284c7; }
 
-        /* 商材個別削除ボタン */
         .btn-clear-item {
             background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;
             padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 800;
@@ -142,7 +129,7 @@
         }
         .btn-clear-item:hover { background: #fca5a5; color: #7f1d1d; }
 
-        /* 日別入力：改行禁止・コンパクトバッジスタイル */
+        /* コンパクトバッジ表示（折れ曲がり防止） */
         .members-row { display: flex; flex-wrap: wrap; gap: 5px; }
         .member-badge { 
             display: inline-flex; align-items: center; gap: 5px; 
@@ -161,18 +148,16 @@
 
         .count-val { background: #ffffff; padding: 1px 5px; border-radius: 8px; font-size: 10px; font-weight: 900; border: 1px solid rgba(0,0,0,0.1); }
 
-        /* スマホ対応グラフコンテナ */
-        .chart-container { position: relative; width: 100%; height: 320px; cursor: pointer; }
-        @media (max-width: 600px) { .chart-container { height: 280px; } }
+        /* スマホ対応グラフコンテナ（つぶれ防止） */
+        .chart-container { position: relative; width: 100%; height: 350px; cursor: pointer; }
+        @media (max-width: 600px) { .chart-container { height: 300px; } }
 
         /* チーム4つ並びスコアボード */
-        .grid-4-teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
-        .team-mini-card { background: #fff; border-radius: 18px; padding: 18px 12px; text-align: center; border: 2px solid #e2e8f0; position: relative; overflow: hidden; transition: transform 0.25s ease; animation: cardPopIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
-        .team-mini-card:hover { transform: translateY(-3px); }
-        .team-mini-card.winner { border-color: #f59e0b; background: linear-gradient(135deg, #fff 0%, #fef3c7 100%); transform: scale(1.02); animation: cardPopIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards, winnerGlow 2s ease-in-out infinite 0.45s; }
+        .grid-4-teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
+        .team-mini-card { background: #fff; border-radius: 18px; padding: 16px 12px; text-align: center; border: 2px solid #e2e8f0; position: relative; overflow: hidden; }
+        .team-mini-card.winner { border-color: #f59e0b; background: linear-gradient(135deg, #fff 0%, #fef3c7 100%); transform: scale(1.02); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2); }
         .team-mini-name { font-size: 14px; font-weight: 900; margin-bottom: 4px; }
         .team-mini-score { font-size: 38px; font-weight: 900; font-family: 'Outfit', sans-serif; line-height: 1; }
-        .team-mini-card.winner .team-mini-score { animation: crownBounce 2s ease-in-out infinite; }
 
         /* 花見川 VS 八千代組 スコアボード */
         .battle-arena-wrapper { position: relative; cursor: pointer; margin-bottom: 20px; }
@@ -189,25 +174,26 @@
         }
         .team-vs-card.hanamigawa { border-color: #93c5fd; background: linear-gradient(135deg, #fff 0%, #eff6ff 100%); }
         .team-vs-card.yachiyo { border-color: #fca5a5; background: linear-gradient(135deg, #fff 0%, #fef2f2 100%); }
-        .team-vs-card.winner { border-color: #f59e0b; background: linear-gradient(135deg, #fff 0%, #fef3c7 100%); transform: scale(1.03); animation: winnerGlow 2s ease-in-out infinite; }
+        .team-vs-card.winner { border-color: #f59e0b; background: linear-gradient(135deg, #fff 0%, #fef3c7 100%); transform: scale(1.03); box-shadow: 0 10px 30px rgba(245, 158, 11, 0.25); }
         
         .trophy-banner { display: none; position: absolute; top: 14px; right: -30px; background: #f59e0b; color: #fff; font-size: 10px; font-weight: 900; padding: 4px 30px; transform: rotate(45deg); }
-        .team-vs-card.winner .trophy-banner { display: block; animation: cardPopIn 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+        .team-vs-card.winner .trophy-banner { display: block; }
         .team-vs-name { font-size: 18px; font-weight: 900; }
         .team-vs-score { font-size: 56px; font-weight: 900; font-family: 'Outfit', sans-serif; line-height: 1; margin: 8px 0; display: inline-block; }
-        .team-vs-score.score-pop { animation: scorePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .vs-badge { font-size: 38px; font-weight: 900; font-family: 'Black Ops One', cursive, sans-serif; font-style: italic; background: linear-gradient(135deg, #ef4444, #f59e0b, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; display: inline-block; animation: vsPulse 1.6s ease-in-out infinite alternate; }
+        .vs-badge { font-size: 38px; font-weight: 900; font-family: 'Black Ops One', cursive, sans-serif; font-style: italic; background: linear-gradient(135deg, #ef4444, #f59e0b, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; }
 
-        /* 王冠表示修正スタイル */
         .winner-crown {
             font-size: 32px; line-height: 1; margin-bottom: 2px; display: none;
             font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
         }
-        .team-vs-card.winner .winner-crown, .team-mini-card.winner .winner-crown { display: block; animation: crownBounce 1.6s ease-in-out infinite; }
+        .team-vs-card.winner .winner-crown, .team-mini-card.winner .winner-crown { display: block; }
 
-        /* 画像再現イベントテーブル */
-        .excel-style-table-wrap { background: #ffffff; border-radius: 12px; padding: 15px; border: 2px solid #000; box-shadow: var(--shadow-card); margin-bottom: 20px; }
-        .excel-table-title { text-align: center; font-size: 18px; font-weight: 900; margin-bottom: 10px; color: #000; }
+        /* イベント・まとめ共有画像用テーブルスタイル */
+        .excel-style-combined-wrap {
+            background: #ffffff; border-radius: 16px; padding: 18px; border: 2px solid #000; box-shadow: var(--shadow-card); margin-bottom: 20px;
+        }
+        .excel-style-table-wrap { background: #ffffff; margin-bottom: 16px; }
+        .excel-table-title { text-align: center; font-size: 18px; font-weight: 900; margin-bottom: 8px; color: #000; letter-spacing: 1px; }
         .excel-table { width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: 13px; text-align: center; }
         .excel-table th, .excel-table td { border: 1.5px solid #000; padding: 7px 8px; font-weight: 800; }
         .excel-table th { background-color: #d9d9d9; color: #000; }
@@ -217,56 +203,37 @@
         .excel-table th.th-pts { background-color: #ff9900; color: #000; }
         .excel-table td.td-pts { background: linear-gradient(90deg, #ffcc00, #ff9900); color: #000; font-size: 16px; font-weight: 900; }
 
+        /* 花畑 */
         .flower-garden-box { background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%); border: 3px solid #34d399; border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 18px; position: relative; overflow: hidden; }
-        .flower-garden-box > *:not(.sparkle-layer) { position: relative; z-index: 1; }
-        .sparkle-layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
-        .sparkle-layer .sparkle { position: absolute; top: -12%; left: 0; opacity: 0; font-size: 16px; animation: sparkleFall linear infinite; }
-        @keyframes sparkleFall {
-            0% { transform: translateY(0) translateX(0) rotate(0deg) scale(0.8); opacity: 0; }
-            12% { opacity: 0.95; }
-            50% { transform: translateY(180px) translateX(var(--drift, 14px)) rotate(180deg) scale(1); }
-            88% { opacity: 0.8; }
-            100% { transform: translateY(380px) translateX(calc(var(--drift, 14px) * -1)) rotate(360deg) scale(0.7); opacity: 0; }
-        }
         .garden-progress-bar { height: 18px; background: #ffffff; border-radius: 10px; overflow: hidden; border: 2px solid #a7f3d0; margin: 12px 0; }
-        .garden-progress-fill {
-            height: 100%;
-            background-image: linear-gradient(90deg, #ffff00, #ff3399, #ff0000),
-                linear-gradient(45deg, rgba(255,255,255,0.25) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.25) 75%, transparent 75%, transparent);
-            background-size: 100% 100%, 28px 28px;
-            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-            animation: shimmerStripes 1s linear infinite;
-        }
-        .flower-canvas { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; min-height: 120px; background: rgba(255,255,255,0.7); border-radius: 16px; padding: 12px; border: 1px dashed #6ee7b7; transition: box-shadow 0.6s ease; }
-        .flower-canvas.blooming { animation: gardenGlow 2.4s ease-in-out infinite; }
-        @keyframes gardenGlow {
-            0%, 100% { box-shadow: 0 0 0 rgba(52, 211, 153, 0); }
-            50% { box-shadow: 0 0 26px rgba(52, 211, 153, 0.55), inset 0 0 18px rgba(255, 255, 255, 0.6); }
-        }
-        .flower-icon { font-size: 26px; display: inline-block; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards, floatFlower 3s ease-in-out infinite 0.3s; }
-        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        .garden-progress-fill { height: 100%; background: linear-gradient(90deg, #ffff00, #ff3399, #ff0000); transition: width 0.5s ease; }
+        .flower-canvas { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; min-height: 120px; background: rgba(255,255,255,0.7); border-radius: 16px; padding: 12px; border: 1px dashed #6ee7b7; }
+        .flower-icon { font-size: 26px; }
 
+        /* 掲示板 */
         .forum-input-card { background: #f8fafc; border-radius: 16px; padding: 16px; margin-bottom: 18px; border: 1px solid #e2e8f0; }
+        .forum-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        @media (max-width: 600px) { .forum-form-grid { grid-template-columns: 1fr; } }
         .forum-list { display: flex; flex-direction: column; gap: 10px; }
-        .forum-post { background: #fff; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; animation: rowIn 0.35s ease backwards; transition: transform 0.2s; }
-        .forum-post:hover { transform: translateX(3px); }
-        .forum-post-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px; }
+        .forum-post { background: #fff; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; border-left: 5px solid var(--accent-blue); }
+        .forum-post-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
+        .tag-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 900; background: #e2e8f0; color: #334155; }
+        .tag-prio-高 { background: #fee2e2; color: #991b1b; }
+        .tag-prio-中 { background: #fef3c7; color: #92400e; }
 
         .table-wrap { overflow-x: auto; border-radius: 16px; background: #fff; }
         table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; }
         th, td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; }
         th { background: #f8fafc; font-weight: 800; }
-        table tbody tr { animation: rowIn 0.35s ease backwards; transition: background 0.2s; }
-        table tbody tr:hover { background: #f8fafc; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #fff; padding: 22px; border-radius: 20px; width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto; }
+        .modal-content { background: #fff; padding: 22px; border-radius: 20px; width: 90%; max-width: 520px; max-height: 85vh; overflow-y: auto; }
         .target-input-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 700; font-size: 13px; }
         .target-input-group input { width: 85px; padding: 6px; border-radius: 8px; border: 1px solid #cbd5e1; text-align: right; }
 
         .copy-hint { position: absolute; top: 8px; right: 12px; font-size: 10px; font-weight: 700; color: var(--text-muted); background: rgba(241,245,249,0.95); padding: 3px 8px; border-radius: 10px; pointer-events: none; z-index: 5; }
         .toast { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 30px; font-weight: 800; font-size: 13px; transition: all 0.3s; z-index: 2000; opacity: 0; }
-        .toast.show { animation: toastBounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     </style>
 </head>
 <body>
@@ -305,12 +272,23 @@
     <div class="glass-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
             <h2 style="font-size: 15px; margin: 0;">📈 月間実績 & 着地見込み（花見川 VS 八千代組）</h2>
-            <div class="toggle-wrapper">
-                <span style="font-size:12px; font-weight:800;">着地見込み表示:</span>
-                <label class="switch">
-                    <input type="checkbox" id="forecastToggle" checked onchange="updateMainChart()">
-                    <span class="slider"></span>
-                </label>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <!-- 目標数値ON/OFFスイッチ -->
+                <div class="toggle-wrapper">
+                    <span style="font-size:12px; font-weight:800;">目標数値表示:</span>
+                    <label class="switch">
+                        <input type="checkbox" id="targetToggle" checked onchange="updateMainChart()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <!-- 着地見込みON/OFFスイッチ -->
+                <div class="toggle-wrapper">
+                    <span style="font-size:12px; font-weight:800;">着地見込み表示:</span>
+                    <label class="switch">
+                        <input type="checkbox" id="forecastToggle" checked onchange="updateMainChart()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
         </div>
         <div class="chart-container" id="mainChartWrap">
@@ -320,7 +298,7 @@
     </div>
 </div>
 
-<!-- PAGE 2: 個人比較分析（人物 ＆ 商材選択機能） -->
+<!-- PAGE 2: 個人比較分析 -->
 <div id="comparePage" class="page-content">
     <div class="glass-panel">
         <div class="controls">
@@ -415,7 +393,7 @@
     </div>
 </div>
 
-<!-- PAGE 4: イエナカ進捗表 (4チーム対抗: サノリーズ・新山口・髙田WEST・その他) -->
+<!-- PAGE 4: イエナカ進捗表 (4チーム対抗) -->
 <div id="ienakaPage" class="page-content">
     <div class="battle-arena-wrapper" id="ienakaArenaWrap">
         <span class="copy-hint">💡 進捗結果長押しで画像コピー</span>
@@ -437,10 +415,9 @@
     </div>
 </div>
 
-<!-- PAGE 5: 菊・蓮・薔薇イベント画面 (Excelデザイン再現) -->
+<!-- PAGE 5: 菊・蓮・薔薇イベント画面 (個人＆チーム統合コピー対応) -->
 <div id="flowerPage" class="page-content">
     <div class="flower-garden-box" id="flowerBoxWrap" style="position:relative; cursor:pointer;">
-        <div class="sparkle-layer" id="sparkleLayer"></div>
         <span class="copy-hint">💡 長押しで画像コピー</span>
         <h2 style="font-size: 20px; margin-top:0; color:#065f46;">🌺 菊・蓮・薔薇 満開ガーデン 🌸</h2>
         <div style="font-size:12px; color:#047857;">イベント目標：全体で <b>100件</b> 到達で満開の花畑が完成！（菊:2点 / 蓮:3点 / 薔薇:5点）</div>
@@ -453,58 +430,95 @@
         <div class="flower-canvas" id="flowerGardenCanvas"></div>
     </div>
 
-    <!-- 個人進捗表 -->
-    <div class="excel-style-table-wrap" id="eventIndividualTableWrap" style="position:relative; cursor:pointer;">
-        <span class="copy-hint">💡 長押しで画像コピー</span>
-        <div class="excel-table-title">個人進捗表</div>
-        <table class="excel-table">
-            <thead>
-                <tr>
-                    <th style="width:18%;">チーム</th>
-                    <th style="width:26%;">名前</th>
-                    <th class="th-kiku" style="width:14%;">菊</th>
-                    <th class="th-hasu" style="width:14%;">蓮</th>
-                    <th class="th-bara" style="width:14%;">薔薇</th>
-                    <th class="th-pts" style="width:14%;">得点</th>
-                </tr>
-            </thead>
-            <tbody id="eventIndividualTableBody"></tbody>
-        </table>
-    </div>
+    <!-- 個人進捗表 ＆ チーム進捗表（1枚の画像として一体長押しコピー） -->
+    <div class="excel-style-combined-wrap" id="eventCombinedTableWrap" style="position:relative; cursor:pointer;">
+        <span class="copy-hint">💡 長押しで個人＆チーム表をまとめて画像コピー</span>
 
-    <!-- チーム進捗表 -->
-    <div class="excel-style-table-wrap" id="eventTeamTableWrap" style="position:relative; cursor:pointer;">
-        <span class="copy-hint">💡 長押しで画像コピー</span>
-        <div class="excel-table-title">チーム進捗表</div>
-        <table class="excel-table">
-            <thead>
-                <tr>
-                    <th style="width:28%;">チーム</th>
-                    <th class="th-kiku" style="width:18%;">菊</th>
-                    <th class="th-hasu" style="width:18%;">蓮</th>
-                    <th class="th-bara" style="width:18%;">薔薇</th>
-                    <th class="th-pts" style="width:18%;">得点</th>
-                </tr>
-            </thead>
-            <tbody id="eventTeamTableBody"></tbody>
-        </table>
+        <!-- 個人進捗表 -->
+        <div class="excel-style-table-wrap">
+            <div class="excel-table-title">個人進捗表</div>
+            <table class="excel-table">
+                <thead>
+                    <tr>
+                        <th style="width:18%;">チーム</th>
+                        <th style="width:26%;">名前</th>
+                        <th class="th-kiku" style="width:14%;">菊</th>
+                        <th class="th-hasu" style="width:14%;">蓮</th>
+                        <th class="th-bara" style="width:14%;">薔薇</th>
+                        <th class="th-pts" style="width:14%;">得点</th>
+                    </tr>
+                </thead>
+                <tbody id="eventIndividualTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- チーム進捗表 -->
+        <div class="excel-style-table-wrap" style="margin-bottom:0;">
+            <div class="excel-table-title">チーム進捗表</div>
+            <table class="excel-table">
+                <thead>
+                    <tr>
+                        <th style="width:28%;">チーム</th>
+                        <th class="th-kiku" style="width:18%;">菊</th>
+                        <th class="th-hasu" style="width:18%;">蓮</th>
+                        <th class="th-bara" style="width:18%;">薔薇</th>
+                        <th class="th-pts" style="width:18%;">得点</th>
+                    </tr>
+                </thead>
+                <tbody id="eventTeamTableBody"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<!-- PAGE 6: みんなのご意見箱 -->
+<!-- PAGE 6: みんなのご意見箱（AI丸投げテキスト出力対応） -->
 <div id="forumPage" class="page-content">
     <div class="glass-panel">
-        <h2 style="font-size: 17px; margin-top:0; color:var(--accent-pink);">📮 みんなのご意見箱・社内掲示板</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <h2 style="font-size: 17px; margin:0; color:var(--accent-pink);">📮 みんなのご意見箱・社内掲示板</h2>
+            <!-- AI出力コピーボタン -->
+            <button class="btn btn-green" onclick="exportForumForAI()">🤖 AI分析用テキストを一括コピー</button>
+        </div>
+
         <div class="forum-input-card">
             <div style="display:flex; flex-direction:column; gap:10px;">
-                <input type="text" id="forumNameInput" placeholder="投稿者の名前（例：金城）">
-                <textarea id="forumTextInput" rows="3" placeholder="要件・ご意見・改善案などを入力してください..."></textarea>
+                <div class="forum-form-grid">
+                    <input type="text" id="forumNameInput" placeholder="投稿者の名前（例：金城）">
+                    <select id="forumCategorySelect">
+                        <option value="業務改善">📌 カテゴリ: 業務改善</option>
+                        <option value="システム・ツール">💻 カテゴリ: システム・ツール</option>
+                        <option value="接客・運用">🤝 カテゴリ: 接客・運用</option>
+                        <option value="企画・イベント">🎉 カテゴリ: 企画・イベント</option>
+                        <option value="その他">💬 カテゴリ: その他</option>
+                    </select>
+                </div>
+                <div class="forum-form-grid">
+                    <select id="forumPrioritySelect">
+                        <option value="中">⚡ 優先度: 中</option>
+                        <option value="高">🔥 優先度: 高（緊急・重要）</option>
+                        <option value="低">🌱 優先度: 低（アイデアレベル）</option>
+                    </select>
+                    <input type="text" id="forumIdeaInput" placeholder="改善案・解決アイデア（任意）">
+                </div>
+                <textarea id="forumTextInput" rows="3" placeholder="要件・ご意見・お困りごとを入力してください..."></textarea>
                 <button class="btn btn-pink" style="align-self:flex-end;" onclick="submitForumPost()">✉️ 掲示板に投稿する</button>
             </div>
         </div>
 
         <h3 style="font-size: 14px; margin-top: 18px;">📋 投稿一覧</h3>
         <div class="forum-list" id="forumListContainer"></div>
+    </div>
+</div>
+
+<!-- AIテキスト出力プレビューモーダル -->
+<div class="modal" id="aiExportModal">
+    <div class="modal-content" style="max-width:650px;">
+        <h3 style="color: var(--accent-blue); margin-top:0;">🤖 AI分析用プロンプト出力</h3>
+        <p style="font-size:12px; color:var(--text-muted);">以下のテキストがクリップボードにコピーされました！そのままAI（ChatGPTやGemini等）に貼り付けて分析・要約させてください。</p>
+        <textarea id="aiExportTextArea" rows="12" style="width:100%; font-size:12px; font-family:monospace;" readonly></textarea>
+        <div style="margin-top: 15px; text-align: right;">
+            <button class="btn btn-style" onclick="closeAiExportModal()">閉じる</button>
+        </div>
     </div>
 </div>
 
@@ -523,9 +537,9 @@
 <div class="toast" id="copyToast">📋 クリップボードに画像をコピーしました！</div>
 
 <script>
-const AUTH_PASS = "hanami364"; // 保護用パスワード
+const AUTH_PASS = "hanami364"; // パスワード
 
-// 指定された商材順序マスター
+// 商材順序マスター
 const ITEMS = [
     "ポイ活",
     "MAX",
@@ -539,7 +553,9 @@ const ITEMS = [
     "プラチナカード",
     "Goldカード",
     "Dカード Gold U",
-    "ドコモ電気"
+    "ドコモ電気",
+    "Google pixel",
+    "Google pixelハイエンド"
 ];
 
 // ポイント換算ルール
@@ -556,7 +572,9 @@ const ITEM_POINTS = {
     "プラチナカード": 3,
     "Goldカード": 2,
     "Dカード Gold U": 1,
-    "ドコモ電気": 2
+    "ドコモ電気": 2,
+    "Google pixel": 1,
+    "Google pixelハイエンド": 2
 };
 
 // メンバーマスター（1ページ目の表示名: 宗廣＝「ム」）
@@ -565,7 +583,7 @@ const ALL_MEMBERS_MASTER = [
     { name: "大熊 百合香", display: "大熊", shortTeam: "大熊", team: "新山口", group: "花見川" },
     { name: "小山 水華", display: "小山", shortTeam: "大熊", team: "新山口", group: "花見川" },
     { name: "高橋 ユリ", display: "ゆり", shortTeam: "大熊", team: "新山口", group: "花見川" },
-    { name: "宗廣 風斗", display: "ム", shortTeam: "大熊", team: "新山口", group: "花見川" }, // 日別入力のみ「ム」
+    { name: "宗廣 風斗", display: "ム", shortTeam: "大熊", team: "新山口", group: "花見川" },
 
     // 花見川 - 髙田WEST
     { name: "高田 日奈子", display: "髙田", shortTeam: "高田", team: "髙田WEST", group: "花見川" },
@@ -605,35 +623,6 @@ let selectedItemsForCompare = [...ITEMS];
 let mainChartInstance = null;
 let compareChartInstance = null;
 let confettiTriggered = false;
-let prevFlowerTotal = 0;
-let flowerMilestonesShown = new Set();
-
-// 表の行を少しずつ時間差でフェードインさせる演出
-function staggerRows(el) {
-    if (!el) return;
-    Array.from(el.children).forEach((row, i) => {
-        row.style.animationDelay = `${Math.min(i * 0.04, 0.6)}s`;
-    });
-}
-
-// 数字をカウントアップさせながら更新する演出
-function animateCountUp(el, targetValue, duration = 700) {
-    if (!el) return;
-    const startValue = parseFloat(el.dataset.rawValue || el.innerText) || 0;
-    if (startValue === targetValue) { el.innerText = targetValue; return; }
-    const startTime = performance.now();
-    el.dataset.rawValue = targetValue;
-    el.classList.remove('score-pop'); void el.offsetWidth; el.classList.add('score-pop');
-    function step(now) {
-        const progress = Math.min((now - startTime) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const current = Math.round(startValue + (targetValue - startValue) * eased);
-        el.innerText = current;
-        if (progress < 1) requestAnimationFrame(step);
-        else el.innerText = targetValue;
-    }
-    requestAnimationFrame(step);
-}
 
 function switchPage(pageId) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -654,7 +643,6 @@ function switchPage(pageId) {
     else if (pageId === 'forumPage') { renderForumPage(); }
 }
 
-// サーバーからデータ通信・一括読み込み
 async function loadStoreDataFromServer() {
     try {
         const res = await fetch('/api/get_all_data');
@@ -665,7 +653,7 @@ async function loadStoreDataFromServer() {
         renderUI();
         updateMainChart();
     } catch (e) {
-        console.error("サーバー読み込みエラー、ローカルフォールバック実行", e);
+        console.error("サーバー読み込みエラー", e);
         const local = localStorage.getItem('store_performance_vs_yachiyo_v5');
         if (local) {
             try { storeData = JSON.parse(local); } catch (err) {}
@@ -675,7 +663,6 @@ async function loadStoreDataFromServer() {
     }
 }
 
-// サーバーにデータ通信・一括保存（「保存ボタン」またはカウント時に実行）
 async function saveDataToServer() {
     localStorage.setItem('store_performance_vs_yachiyo_v5', JSON.stringify(storeData));
     try {
@@ -706,8 +693,6 @@ document.getElementById('monthPicker').value = currentMonth;
 document.getElementById('monthPicker').addEventListener('change', (e) => {
     currentMonth = e.target.value;
     confettiTriggered = false;
-    prevFlowerTotal = 0;
-    flowerMilestonesShown = new Set();
     renderComparisonPage();
     renderPointsPage();
     renderIenakaPage();
@@ -826,7 +811,7 @@ function renderUI() {
                 const count = dayData[item][m.name] || 0;
                 const badge = createBadge(m.display, m.name, count, m.team, (newVal) => {
                     storeData.daily[currentDate][item][m.name] = newVal;
-                    saveDataToServer(); // 自動保存
+                    saveDataToServer();
                 });
                 row.appendChild(badge);
             });
@@ -843,6 +828,7 @@ function renderUI() {
     });
 }
 
+// 長押し確認ポップアップを削除し、直接0リセットされるバッジ生成
 function createBadge(displayName, fullName, count, teamName, onChange) {
     const btn = document.createElement('div');
     btn.className = `member-badge ${BADGE_CLASSES[teamName]}`;
@@ -853,7 +839,8 @@ function createBadge(displayName, fullName, count, teamName, onChange) {
         isLongPress = false;
         timer = setTimeout(() => {
             isLongPress = true;
-            if (confirm(`【確認】\n${fullName} さんの「${count}」を 0 にリセットしますか？`)) onChange(0);
+            onChange(0); // ポップアップを出さずに即時0リセット
+            showToastMsg(`↺ ${fullName} さんのカウントを0にリセットしました`);
         }, 700);
     };
 
@@ -879,7 +866,9 @@ function toggleView() {
     renderUI();
 }
 
+// グラフ描画（目標ライン＆着地見込みトグル連動、アニメーション無効化でコピーズレ解消）
 function updateMainChart() {
+    const showTarget = document.getElementById('targetToggle').checked;
     const showForecast = document.getElementById('forecastToggle').checked;
     const summary = calculateMonthlySummary(currentDate.substring(0, 7));
     
@@ -905,12 +894,17 @@ function updateMainChart() {
         targetData.push(storeData.targets[item] || 0);
     });
 
-    const datasets = [
-        { type: 'line', label: '🎯 目標数値', data: targetData, borderColor: '#f59e0b', borderWidth: 3, fill: false },
-        { label: '花見川チーム (実績)', data: hanamigawaActuals, backgroundColor: '#2563eb' },
-        { label: '八千代組 (実績)', data: yachiyoActuals, backgroundColor: '#ef4444' }
-    ];
+    const datasets = [];
 
+    // 目標ライン表示トグル
+    if (showTarget) {
+        datasets.push({ type: 'line', label: '🎯 目標数値', data: targetData, borderColor: '#f59e0b', borderWidth: 3, fill: false });
+    }
+
+    datasets.push({ label: '花見川チーム (実績)', data: hanamigawaActuals, backgroundColor: '#2563eb' });
+    datasets.push({ label: '八千代組 (実績)', data: yachiyoActuals, backgroundColor: '#ef4444' });
+
+    // 着地見込み表示トグル
     if (showForecast) {
         datasets.push({ label: '花見川チーム (着地見込み)', data: hanamigawaForecasts, backgroundColor: 'rgba(37, 99, 235, 0.3)', borderColor: '#2563eb', borderWidth: 1 });
         datasets.push({ label: '八千代組 (着地見込み)', data: yachiyoForecasts, backgroundColor: 'rgba(239, 68, 68, 0.3)', borderColor: '#ef4444', borderWidth: 1 });
@@ -925,7 +919,7 @@ function updateMainChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: false,
+            animation: false, // キャプチャ時初期フレーム固定の防止
             scales: { y: { beginAtZero: true } }
         }
     });
@@ -1048,7 +1042,6 @@ function renderComparisonTable() {
     totalRowHTML += `<td><b style="color:var(--team-yachiyo-txt); font-size:16px;">${Math.round(grandTotal * 10) / 10}</b></td></tr>`;
 
     tableBody.innerHTML = bodyHTML + totalRowHTML;
-    staggerRows(tableBody);
 }
 
 function updateCompareChart() {
@@ -1072,6 +1065,7 @@ function updateCompareChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: false,
             scales: { y: { beginAtZero: true } }
         }
     });
@@ -1100,8 +1094,8 @@ function renderPointsPage() {
         });
     });
 
-    animateCountUp(document.getElementById('scoreHanamigawa'), scoreHanamigawa);
-    animateCountUp(document.getElementById('scoreYachiyo'), scoreYachiyo);
+    document.getElementById('scoreHanamigawa').innerText = scoreHanamigawa;
+    document.getElementById('scoreYachiyo').innerText = scoreYachiyo;
 
     const cardH = document.getElementById('teamHanamigawaCard');
     const cardY = document.getElementById('teamYachiyoCard');
@@ -1137,7 +1131,6 @@ function renderPointsPage() {
     });
 
     body.innerHTML = bodyHTML;
-    staggerRows(body);
 }
 
 // ---------------- 4. イエナカ進捗表 (4チーム対抗) ----------------
@@ -1182,7 +1175,6 @@ function renderIenakaPage() {
         `;
         grid.appendChild(card);
     });
-    staggerRows(grid);
 
     const body = document.getElementById('ienakaTableBody');
     let bodyHTML = '';
@@ -1203,10 +1195,9 @@ function renderIenakaPage() {
     });
 
     body.innerHTML = bodyHTML;
-    staggerRows(body);
 }
 
-// ---------------- 5. 菊・蓮・薔薇イベント画面 (Excelデザイン再現) ----------------
+// ---------------- 5. 菊・蓮・薔薇イベント画面 (個人＆チーム統合コピー対応) ----------------
 function renderFlowerPage() {
     const summary = calculateMonthlySummary(currentMonth);
     const totals = summary.totalCounts;
@@ -1242,32 +1233,16 @@ function renderFlowerPage() {
     document.getElementById('flowerProgressBar').style.width = `${progressRate}%`;
     document.getElementById('flowerProgressText').innerText = `${totalFlowerCount} / 100件 (${progressRate}%)`;
 
-    renderSparkleLayer();
-
     const canvas = document.getElementById('flowerGardenCanvas');
     canvas.innerHTML = '';
-    canvas.classList.toggle('blooming', totalFlowerCount > 0);
 
     if (totalFlowerCount === 0) {
         canvas.innerHTML = '<div style="color:var(--text-muted); font-size:12px; padding:15px;">菊・蓮・薔薇が成約されると、ここに花が咲き始めます🌸</div>';
     } else {
-        let flowerIdx = 0;
-        const flowerDelay = () => `style="animation-delay:${Math.min(flowerIdx++ * 0.03, 1.2)}s, ${0.3 + Math.min(flowerIdx * 0.03, 1.2)}s"`;
-        for (let i = 0; i < totalKiku; i++) canvas.innerHTML += `<span class="flower-icon" title="菊" ${flowerDelay()}>🌼</span>`;
-        for (let i = 0; i < totalHasu; i++) canvas.innerHTML += `<span class="flower-icon" title="蓮" ${flowerDelay()}>🪷</span>`;
-        for (let i = 0; i < totalBara; i++) canvas.innerHTML += `<span class="flower-icon" title="薔薇" ${flowerDelay()}>🌹</span>`;
+        for (let i = 0; i < totalKiku; i++) canvas.innerHTML += '<span class="flower-icon" title="菊">🌼</span>';
+        for (let i = 0; i < totalHasu; i++) canvas.innerHTML += '<span class="flower-icon" title="蓮">🪷</span>';
+        for (let i = 0; i < totalBara; i++) canvas.innerHTML += '<span class="flower-icon" title="薔薇">🌹</span>';
     }
-
-    if (totalFlowerCount > prevFlowerTotal) {
-        burstFlowerParticles(Math.min(totalFlowerCount - prevFlowerTotal, 6));
-    }
-    [25, 50, 75].forEach(milestone => {
-        if (progressRate >= milestone && !flowerMilestonesShown.has(milestone)) {
-            flowerMilestonesShown.add(milestone);
-            burstFlowerParticles(10);
-        }
-    });
-    prevFlowerTotal = totalFlowerCount;
 
     if (totalFlowerCount >= 100) triggerConfetti();
 
@@ -1291,7 +1266,6 @@ function renderFlowerPage() {
         `;
     });
     indBody.innerHTML = indHTML;
-    staggerRows(indBody);
 
     // チーム進捗表
     const teamBody = document.getElementById('eventTeamTableBody');
@@ -1312,10 +1286,9 @@ function renderFlowerPage() {
         `;
     });
     teamBody.innerHTML = teamHTML;
-    staggerRows(teamBody);
 }
 
-// ---------------- 6. みんなのご意見箱 ----------------
+// ---------------- 6. みんなのご意見箱 & 🤖 AI一括分析テキスト出力 ----------------
 function renderForumPage() {
     const container = document.getElementById('forumListContainer');
     container.innerHTML = '';
@@ -1328,33 +1301,49 @@ function renderForumPage() {
     [...storeData.forum].reverse().forEach((post) => {
         const card = document.createElement('div');
         card.className = 'forum-post';
+        const category = post.category || 'その他';
+        const priority = post.priority || '中';
+        const ideaText = post.idea ? `\n💡 改善案: ${post.idea}` : '';
+
         card.innerHTML = `
             <div class="forum-post-header">
-                <span>👤 投稿者: ${post.name}</span>
+                <div>
+                    <span>👤 投稿者: ${post.name}</span>
+                    <span class="tag-badge" style="margin-left:6px;">${category}</span>
+                    <span class="tag-badge tag-prio-${priority}" style="margin-left:4px;">優先度: ${priority}</span>
+                </div>
                 <span>📅 ${post.date}</span>
             </div>
-            <div style="font-size:13px; font-weight:700; color:var(--text-main); white-space:pre-wrap;">${post.text}</div>
+            <div style="font-size:13px; font-weight:700; color:var(--text-main); white-space:pre-wrap;">${post.text}${ideaText}</div>
         `;
         container.appendChild(card);
     });
-    staggerRows(container);
 }
 
 function submitForumPost() {
     const nameInput = document.getElementById('forumNameInput');
+    const categorySelect = document.getElementById('forumCategorySelect');
+    const prioritySelect = document.getElementById('forumPrioritySelect');
+    const ideaInput = document.getElementById('forumIdeaInput');
     const textInput = document.getElementById('forumTextInput');
 
     const name = nameInput.value.trim() || '匿名';
+    const category = categorySelect.value;
+    const priority = prioritySelect.value;
+    const idea = ideaInput.value.trim();
     const text = textInput.value.trim();
 
     if (!text) {
-        alert("要件・ご意見内容を入力してください。");
+        alert("要件・お困りごと・ご意見内容を入力してください。");
         return;
     }
 
     const newPost = {
         id: Date.now(),
         name: name,
+        category: category,
+        priority: priority,
+        idea: idea,
         text: text,
         date: new Date().toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
     };
@@ -1364,8 +1353,53 @@ function submitForumPost() {
 
     saveDataToServer();
     textInput.value = '';
+    ideaInput.value = '';
     showToastMsg("✉️ 掲示板にご意見を投稿しました！");
     renderForumPage();
+}
+
+// 🤖 蓄積された意見・要望をAI分析用テキストとして整形＆コピー
+function exportForumForAI() {
+    if (!storeData.forum || storeData.forum.length === 0) {
+        alert("分析対象の投稿データがまだありません。");
+        return;
+    }
+
+    const nowStr = new Date().toLocaleDateString('ja-JP');
+    let promptText = `【店舗改善ご意見箱 蓄積データ（AI丸投げ分析用）】\n`;
+    promptText += `出力日時: ${nowStr}\n`;
+    promptText += `総投稿件数: ${storeData.forum.length}件\n\n`;
+    promptText += `=== 投稿データ一覧 ===\n`;
+
+    storeData.forum.forEach((post, index) => {
+        promptText += `\n[投稿 #${index + 1}]\n`;
+        promptText += `・投稿日時: ${post.date}\n`;
+        promptText += `・投稿者名: ${post.name}\n`;
+        promptText += `・カテゴリ: ${post.category || 'その他'}\n`;
+        promptText += `・優先度: ${post.priority || '中'}\n`;
+        promptText += `・要件・課題: ${post.text}\n`;
+        if (post.idea) promptText += `・現場からの改善案アイデア: ${post.idea}\n`;
+    });
+
+    promptText += `\n========================\n`;
+    promptText += `【AI指示・プロンプト】\n`;
+    promptText += `上記のスタッフからの投稿データを分析し、以下のフォーマットで整理・要約・提案を行ってください：\n`;
+    promptText += `1. 現場の主要課題トップ3（緊急度・頻度の高いもの）\n`;
+    promptText += `2. カテゴリ別の傾向と対策アドバイス\n`;
+    promptText += `3. 今すぐ実行すべき具体的なアクションプラン（現場の改善案も考慮）\n`;
+
+    // モーダルへセット
+    document.getElementById('aiExportTextArea').value = promptText;
+    document.getElementById('aiExportModal').style.display = 'flex';
+
+    // クリップボードへ自動コピー
+    navigator.clipboard.writeText(promptText).then(() => {
+        showToastMsg("🤖 AI分析用テキストをコピーしました！");
+    }).catch(() => {});
+}
+
+function closeAiExportModal() {
+    document.getElementById('aiExportModal').style.display = 'none';
 }
 
 function triggerConfetti() {
@@ -1380,44 +1414,7 @@ function triggerConfetti() {
     }
 }
 
-function renderSparkleLayer() {
-    const layer = document.getElementById('sparkleLayer');
-    if (!layer || layer.dataset.built === '1') return;
-    layer.dataset.built = '1';
-    const emojis = ['✨', '🌟', '💫', '⭐'];
-    let html = '';
-    for (let i = 0; i < 16; i++) {
-        const left = Math.random() * 96;
-        const duration = (5 + Math.random() * 4).toFixed(2);
-        const delay = (Math.random() * 8).toFixed(2);
-        const drift = Math.round(10 + Math.random() * 30);
-        const size = (12 + Math.random() * 10).toFixed(0);
-        const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-        html += `<span class="sparkle" style="left:${left}%; font-size:${size}px; --drift:${drift}px; animation-duration:${duration}s; animation-delay:${delay}s;">${emoji}</span>`;
-    }
-    layer.innerHTML = html;
-}
-
-function burstFlowerParticles(count) {
-    if (typeof confetti !== 'function') return;
-    const wrap = document.getElementById('flowerBoxWrap');
-    if (!wrap) return;
-    const rect = wrap.getBoundingClientRect();
-    if (rect.width === 0 && rect.height === 0) return;
-    const originX = (rect.left + rect.width / 2) / window.innerWidth;
-    const originY = (rect.top + rect.height / 2) / window.innerHeight;
-    confetti({
-        particleCount: 12 + count * 3,
-        spread: 70,
-        startVelocity: 22,
-        gravity: 0.6,
-        scalar: 0.7,
-        colors: ['#34d399', '#f472b6', '#facc15', '#fb7185'],
-        origin: { x: originX, y: originY }
-    });
-}
-
-// 画像コピー機能
+// アニメーション完了フレームを確実に画像コピーするロジック
 function setupChartCopy(wrapId, chartInstanceGetter) {
     const wrap = document.getElementById(wrapId);
     let timer = null;
@@ -1492,23 +1489,18 @@ function saveTargets() {
 }
 
 // 🔒 削除機能ロジック（パスワード認証: hanami364）
-
-// 1. 本日データ削除
 function clearCurrentDateData() {
     const pass = prompt(`⚠️ [${currentDate}] の入力データをリセットします。\nパスワードを入力してください:`);
     if (pass === null) return;
     if (pass === AUTH_PASS) {
-        if (confirm(`本当に [${currentDate}] のデータを消去しますか？`)) {
-            delete storeData.daily[currentDate];
-            saveDataToServer();
-            showToastMsg(`🗑 [${currentDate}] のデータを削除しました`);
-        }
+        delete storeData.daily[currentDate];
+        saveDataToServer();
+        showToastMsg(`🗑 [${currentDate}] のデータを削除しました`);
     } else {
         alert("❌ パスワードが違います。");
     }
 }
 
-// 2. 商材ごとの本日データ削除
 function clearItemData(item) {
     const pass = prompt(`⚠️ [${currentDate}] の「${item}」データだけをリセットします。\nパスワードを入力してください:`);
     if (pass === null) return;
@@ -1523,16 +1515,13 @@ function clearItemData(item) {
     }
 }
 
-// 3. 全データ初期化
 function clearAllData() {
     const pass = prompt("⚠️ 【警告】すべてのデータ（全日程・目標・掲示板）を初期化します。\nパスワードを入力してください:");
     if (pass === null) return;
     if (pass === AUTH_PASS) {
-        if (confirm("⚠️ 【最終確認】本当に全データを初期化しますか？この操作は取り消せません。")) {
-            storeData = { daily: {}, targets: {}, forum: [] };
-            saveDataToServer();
-            showToastMsg("🗑 全データを削除しました");
-        }
+        storeData = { daily: {}, targets: {}, forum: [] };
+        saveDataToServer();
+        showToastMsg("🗑 全データを削除しました");
     } else {
         alert("❌ パスワードが違います。");
     }
@@ -1546,8 +1535,7 @@ setupChartCopy('compareChartWrap', () => compareChartInstance);
 setupArenaCopy('pointsArenaWrap');
 setupArenaCopy('ienakaArenaWrap');
 setupArenaCopy('flowerBoxWrap');
-setupArenaCopy('eventIndividualTableWrap');
-setupArenaCopy('eventTeamTableWrap');
+setupArenaCopy('eventCombinedTableWrap'); // 統合画像コピー
 </script>
 </body>
 </html>
