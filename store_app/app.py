@@ -3,7 +3,7 @@ import requests
 
 app = Flask(__name__)
 
-# JSONBin 情報（データベース）
+# JSONBin（永久保存用データベース）情報
 BIN_ID = '6a77edbeda38895dfecbdb48'
 API_KEY = '$2a$10$92xqDnm1PpFIMdMZAQN4ruvsIahgOinrURJkZVdAW.ErjgBSWysYG'
 
@@ -28,12 +28,12 @@ def save_data(data):
     except Exception as e:
         print("Save Error:", e)
 
-# ✏️ 通常入力・管理者用ページ
+# 通常入力・管理者用ページ
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# 📱 一般閲覧専用ページ（/view）
+# 📱 一般スタッフ閲覧専用URL
 @app.route('/view')
 def view_only():
     return render_template('index.html')
