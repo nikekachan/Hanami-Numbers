@@ -59,7 +59,8 @@
         body.read-only-mode .btn-gold,
         body.read-only-mode .btn-save,
         body.read-only-mode .forum-input-card,
-        body.read-only-mode .admin-action-bar {
+        body.read-only-mode .admin-action-bar,
+        body.read-only-mode .forum-select-cb {
             display: none !important;
         }
 
@@ -120,7 +121,7 @@
         input:checked + .slider { background-color: var(--accent-blue); }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        /* 商材カード (100%基準の色分け：未満は赤、100%以上は緑) */
+        /* 商材カード */
         .item-card { background: #fff; border: 2px solid var(--panel-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-card); transition: all 0.3s; }
         .item-card.level-0 { background: #fef2f2; border-color: #fca5a5; }
         .item-card.level-complete { background: #ecfdf5; border-color: #10b981; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2); }
@@ -139,15 +140,14 @@
         }
         .btn-clear-item:hover { background: #fca5a5; color: #7f1d1d; }
 
-        /* コンパクトバッジ表示 */
+        /* コンパクトバッジ表示（高速タップ対応） */
         .members-row { display: flex; flex-wrap: wrap; gap: 5px; }
         .member-badge { 
             display: inline-flex; align-items: center; gap: 5px; 
-            padding: 4px 9px; border-radius: 16px; font-size: 11px; font-weight: 800; 
-            cursor: pointer; user-select: none; border: 1.5px solid transparent; transition: all 0.15s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04); white-space: nowrap;
+            padding: 5px 10px; border-radius: 16px; font-size: 11px; font-weight: 800; 
+            cursor: pointer; user-select: none; border: 1.5px solid transparent; transition: background 0.1s, transform 0.05s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04); white-space: nowrap; touch-action: manipulation;
         }
-        .member-badge:hover { transform: translateY(-1px) scale(1.04); }
         .member-badge:active { transform: scale(0.92); }
 
         .badge-yamaguchi { color: #15803d; border-color: #a7f3d0; background: #ecfdf5; }
@@ -156,7 +156,7 @@
         .badge-yachiyo { color: #be185d; border-color: #fbcfe8; background: #fce7f3; }
         .badge-other { color: #b91c1c; border-color: #fca5a5; background: #fee2e2; }
 
-        .count-val { background: #ffffff; padding: 1px 5px; border-radius: 8px; font-size: 10px; font-weight: 900; border: 1px solid rgba(0,0,0,0.1); }
+        .count-val { background: #ffffff; padding: 1px 5px; border-radius: 8px; font-size: 10px; font-weight: 900; border: 1px solid rgba(0,0,0,0.1); pointer-events: none; }
 
         /* スマホ対応グラフコンテナ */
         .chart-container { position: relative; width: 100%; height: 350px; cursor: pointer; }
@@ -213,7 +213,6 @@
         .excel-table th.th-pts { background-color: #ff9900; color: #000; }
         .excel-table td.td-pts { background: linear-gradient(90deg, #ffcc00, #ff9900); color: #000; font-size: 16px; font-weight: 900; }
 
-        /* 花畑 */
         .flower-garden-box { background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%); border: 3px solid #34d399; border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 18px; position: relative; overflow: hidden; }
         .garden-progress-bar { height: 18px; background: #ffffff; border-radius: 10px; overflow: hidden; border: 2px solid #a7f3d0; margin: 12px 0; }
         .garden-progress-fill { height: 100%; background: linear-gradient(90deg, #ffff00, #ff3399, #ff0000); transition: width 0.5s ease; }
@@ -224,15 +223,18 @@
         .forum-input-card { background: #f8fafc; border-radius: 16px; padding: 16px; margin-bottom: 18px; border: 1px solid #e2e8f0; }
         .forum-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         @media (max-width: 600px) { .forum-form-grid { grid-template-columns: 1fr; } }
-        .forum-filter-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+        .forum-filter-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+        .forum-filter-tabs { display: flex; gap: 6px; }
         .forum-filter-btn { padding: 5px 12px; font-size: 12px; font-weight: 800; border-radius: 10px; border: 1px solid #cbd5e1; background: #fff; color: var(--text-muted); cursor: pointer; }
         .forum-filter-btn.active { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
 
-        .forum-list { display: flex; flex-direction: column; gap: 10px; }
-        .forum-post { background: #fff; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; border-left: 5px solid var(--accent-blue); }
+        .forum-list { display: flex; flex-direction: column; gap: 12px; }
+        .forum-post { background: #fff; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; border-left: 5px solid var(--accent-blue); position: relative; }
         .forum-post.status-done { border-left-color: var(--accent-green); background: #f6fbf7; }
-        .forum-post-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
+        .forum-post-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; flex-wrap: wrap; gap: 6px; align-items: center; }
         
+        .forum-select-cb { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent-blue); }
+
         .tag-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 900; background: #e2e8f0; color: #334155; }
         .tag-prio-高 { background: #fee2e2; color: #991b1b; }
         .tag-prio-中 { background: #fef3c7; color: #92400e; }
@@ -386,7 +388,7 @@
     </div>
 </div>
 
-<!-- PAGE 3: チーム点数対抗 (花見川 VS 八千代組) -->
+<!-- PAGE 3: チーム点数対抗 -->
 <div id="pointsPage" class="page-content">
     <div class="battle-arena-wrapper" id="pointsArenaWrap">
         <span class="copy-hint">💡 結果長押しで画像コピー</span>
@@ -532,9 +534,12 @@
             </div>
         </div>
 
-        <!-- ご意見箱 ステータス別絞り込みタブ -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
-            <h3 style="font-size: 14px; margin:0;">📋 投稿一覧</h3>
+        <!-- 投稿一覧コントロールバー（複数選択一括削除 ＆ ステータスフィルター） -->
+        <div class="forum-filter-bar">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <h3 style="font-size: 14px; margin:0;">📋 投稿一覧</h3>
+                <button class="btn btn-danger" style="padding:3px 8px; font-size:11px;" onclick="deleteSelectedForumPosts()">🗑 チェック項目を一括削除</button>
+            </div>
             <div class="forum-filter-tabs">
                 <button class="forum-filter-btn active" onclick="setForumFilter('all', this)">すべて</button>
                 <button class="forum-filter-btn" onclick="setForumFilter('open', this)">未対応</button>
@@ -573,7 +578,7 @@
 <div class="toast" id="copyToast">📋 クリップボードに画像をコピーしました！</div>
 
 <script>
-const AUTH_PASS = "hanami364"; // パスワード
+const AUTH_PASS = "hanami364"; // 保護用パスワード
 
 // 商材順序マスター
 const ITEMS = [
@@ -653,7 +658,7 @@ let currentMonth = currentDate.substring(0, 7);
 let storeData = { daily: {}, targets: {}, forum: [] };
 let viewMode = 'individual';
 let isReadOnly = false;
-let currentForumFilter = 'all'; // ご意見箱フィルター状態 ('all', 'open', 'completed')
+let currentForumFilter = 'all';
 
 let selectedMembersForCompare = ALL_MEMBERS_MASTER.map(m => m.name);
 let selectedItemsForCompare = [...ITEMS];
@@ -761,17 +766,16 @@ function getDayData(dateStr) {
     return dayObj;
 }
 
-// 修正：経過日数（何日目）を用いた精度の高い着地見込み計算ロジック
+// 経過日数（何日目）に基づく正確な着地見込み＆達成率計算ロジック
 function calculateMonthlySummary(monthStr) {
     const daily = storeData.daily;
     const year = parseInt(monthStr.split('-')[0], 10);
     const month = parseInt(monthStr.split('-')[1], 10);
     const totalDaysInMonth = new Date(year, month, 0).getDate();
     
-    // 何日目 (選択されている日付の日番号)
     let selectedDay = parseInt(currentDate.split('-')[2], 10) || 1;
     if (currentDate.substring(0, 7) !== monthStr) {
-        selectedDay = totalDaysInMonth; // 過去・未来月指定時は月の総日数
+        selectedDay = totalDaysInMonth;
     }
     const daysPassed = Math.max(1, Math.min(selectedDay, totalDaysInMonth));
 
@@ -827,20 +831,20 @@ function renderUI() {
         const targetVal = storeData.targets[item] || 0;
         const actProgress = targetVal > 0 ? ((totalAct / targetVal) * 100).toFixed(1) : '0.0';
         
-        // （（現状の件数/何日目×月の総日数/目標数）×100）％の見込み計算
+        // （（現状の件数/何日目×月の総日数/目標数）×100）％の見込み計算（投稿 #2）
         const fcastProgressRate = targetVal > 0 ? ((totalFcast / targetVal) * 100) : 0;
         const fcastProgressStr = targetVal > 0 ? fcastProgressRate.toFixed(1) : '0.0';
 
-        // 達成率は100％を基準（100%未満＝赤、100%以上＝緑）
+        // 達成率は100％を基準（100%未満＝赤、100%以上＝緑）（投稿 #3）
         let levelClass = '';
         let badgeLvlClass = 'lvl-normal';
 
         if (targetVal > 0) {
             if (fcastProgressRate >= 100) {
-                levelClass = 'level-complete'; // 緑っぽく
+                levelClass = 'level-complete'; // 上回ったら緑っぽく
                 badgeLvlClass = 'lvl-complete';
             } else {
-                levelClass = 'level-0'; // 赤
+                levelClass = 'level-0'; // 下回ったら赤
                 badgeLvlClass = 'lvl-0';
             }
         }
@@ -886,26 +890,36 @@ function renderUI() {
     });
 }
 
+// 連続ポチポチタップの応答性向上（投稿 #1 対応）
 function createBadge(displayName, fullName, count, teamName, onChange) {
     const btn = document.createElement('div');
     btn.className = `member-badge ${BADGE_CLASSES[teamName]}`;
     btn.innerHTML = `<span>${displayName}</span> <span class="count-val">${count}</span>`;
 
     let timer = null, isLongPress = false;
-    const startPress = () => {
+
+    const handlePressStart = (e) => {
         if (isReadOnly) return;
         isLongPress = false;
         timer = setTimeout(() => {
             isLongPress = true;
             onChange(0);
             showToastMsg(`↺ ${fullName} さんのカウントを0にリセットしました`);
-        }, 700);
+        }, 650);
     };
 
-    btn.addEventListener('mousedown', startPress);
-    btn.addEventListener('mouseup', () => { clearTimeout(timer); if (!isLongPress && !isReadOnly) onChange(count + 1); });
-    btn.addEventListener('touchstart', startPress, { passive: true });
-    btn.addEventListener('touchend', (e) => { clearTimeout(timer); if (!isLongPress && !isReadOnly) { e.preventDefault(); onChange(count + 1); } });
+    const handlePressEnd = (e) => {
+        if (isReadOnly) return;
+        clearTimeout(timer);
+        if (!isLongPress) {
+            e.preventDefault();
+            e.stopPropagation();
+            onChange(count + 1);
+        }
+    };
+
+    btn.addEventListener('pointerdown', handlePressStart);
+    btn.addEventListener('pointerup', handlePressEnd);
 
     return btn;
 }
@@ -1343,7 +1357,7 @@ function renderFlowerPage() {
     teamBody.innerHTML = teamHTML;
 }
 
-// ---------------- 6. みんなのご意見箱 & フィルター切替機能 ----------------
+// ---------------- 6. みんなのご意見箱（複数削除＆パスワード不要対応投稿 #3） ----------------
 function setForumFilter(filterType, btnEl) {
     currentForumFilter = filterType;
     document.querySelectorAll('.forum-filter-btn').forEach(b => b.classList.remove('active'));
@@ -1362,7 +1376,6 @@ function renderForumPage() {
 
     let posts = [...storeData.forum].reverse();
 
-    // 未対応・適用済みの絞り込みフィルター（投稿 #4 対応）
     if (currentForumFilter === 'open') {
         posts = posts.filter(p => p.status !== '適用済み');
     } else if (currentForumFilter === 'completed') {
@@ -1388,11 +1401,12 @@ function renderForumPage() {
 
         card.innerHTML = `
             <div class="forum-post-header">
-                <div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <input type="checkbox" class="forum-select-cb" data-id="${post.id}" title="削除対象に選択">
                     <span>👤 投稿者: ${post.name}</span>
-                    <span class="tag-badge" style="margin-left:6px;">${category}</span>
-                    <span class="tag-badge tag-prio-${priority}" style="margin-left:4px;">優先度: ${priority}</span>
-                    <span class="status-badge ${statusClass}" style="margin-left:6px;">${statusText}</span>
+                    <span class="tag-badge">${category}</span>
+                    <span class="tag-badge tag-prio-${priority}">優先度: ${priority}</span>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
                 </div>
                 <span>📅 ${post.date}</span>
             </div>
@@ -1484,34 +1498,64 @@ function replyToPost(postId) {
     }
 }
 
+// 個別削除：パスワード不要・ポップアップ確認のみ（投稿 #3 対応）
 function deleteForumPost(postId) {
-    const pass = prompt("🔐 管理者パスワードを入力してください:");
-    if (pass === null) return;
-    if (pass === AUTH_PASS) {
-        if (confirm("この投稿を削除しますか？")) {
-            storeData.forum = storeData.forum.filter(p => p.id !== postId);
-            saveDataToServer();
-            showToastMsg("🗑 投稿を削除しました");
-            renderForumPage();
-        }
-    } else {
-        alert("❌ パスワードが違います。");
+    if (confirm("この投稿を削除しますか？")) {
+        storeData.forum = storeData.forum.filter(p => p.id !== postId);
+        saveDataToServer();
+        showToastMsg("🗑 投稿を削除しました");
+        renderForumPage();
     }
 }
 
+// チェックボックス選択項目の複数一括削除（パスワード不要・ポップアップ確認のみ）（投稿 #3 対応）
+function deleteSelectedForumPosts() {
+    const checkedCbs = document.querySelectorAll('.forum-select-cb:checked');
+    if (checkedCbs.length === 0) {
+        alert("削除したい投稿のチェックボックスを選択してください。");
+        return;
+    }
+
+    if (confirm(`選択された ${checkedCbs.length} 件の投稿を削除しますか？`)) {
+        const idsToDelete = Array.from(checkedCbs).map(cb => parseInt(cb.dataset.id, 10));
+        storeData.forum = storeData.forum.filter(p => !idsToDelete.includes(p.id));
+        saveDataToServer();
+        showToastMsg(`🗑 選択された ${checkedCbs.length} 件の投稿を削除しました`);
+        renderForumPage();
+    }
+}
+
+// 🤖 選択中のフィルター範囲内でAI分析用プロンプト出力（投稿 #2 対応）
 function exportForumForAI() {
     if (!storeData.forum || storeData.forum.length === 0) {
         alert("分析対象の投稿データがまだありません。");
         return;
     }
 
+    let targetPosts = [...storeData.forum].reverse();
+    let filterLabel = "すべて";
+
+    if (currentForumFilter === 'open') {
+        targetPosts = targetPosts.filter(p => p.status !== '適用済み');
+        filterLabel = "未対応のみ";
+    } else if (currentForumFilter === 'completed') {
+        targetPosts = targetPosts.filter(p => p.status === '適用済み');
+        filterLabel = "適用済みのみ";
+    }
+
+    if (targetPosts.length === 0) {
+        alert(`選択中の範囲（${filterLabel}）に該当する投稿がありません。`);
+        return;
+    }
+
     const nowStr = new Date().toLocaleDateString('ja-JP');
     let promptText = `【店舗改善ご意見箱 蓄積データ（AI丸投げ分析用）】\n`;
     promptText += `出力日時: ${nowStr}\n`;
-    promptText += `総投稿件数: ${storeData.forum.length}件\n\n`;
+    promptText += `出力範囲: ${filterLabel}\n`;
+    promptText += `対象件数: ${targetPosts.length}件\n\n`;
     promptText += `=== 投稿データ一覧 ===\n`;
 
-    storeData.forum.forEach((post, index) => {
+    targetPosts.forEach((post, index) => {
         promptText += `\n[投稿 #${index + 1}]\n`;
         promptText += `・投稿日時: ${post.date}\n`;
         promptText += `・投稿者名: ${post.name}\n`;
@@ -1531,7 +1575,7 @@ function exportForumForAI() {
     document.getElementById('aiExportModal').style.display = 'flex';
 
     navigator.clipboard.writeText(promptText).then(() => {
-        showToastMsg("🤖 AI改修指示プロンプトをコピーしました！");
+        showToastMsg(`🤖 AI改修指示プロンプト（${filterLabel}）をコピーしました！`);
     }).catch(() => {});
 }
 
