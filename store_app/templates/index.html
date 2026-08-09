@@ -145,7 +145,7 @@
         }
         .btn-clear-item:hover { background: #fca5a5; color: #7f1d1d; }
 
-        /* コンパクトバッジ表示（折れ曲がり防止） */
+        /* コンパクトバッジ表示 */
         .members-row { display: flex; flex-wrap: wrap; gap: 5px; }
         .member-badge { 
             display: inline-flex; align-items: center; gap: 5px; 
@@ -168,7 +168,7 @@
         .chart-container { position: relative; width: 100%; height: 350px; cursor: pointer; }
         @media (max-width: 600px) { .chart-container { height: 300px; } }
 
-        /* チーム4つ並びスコアボード */
+        /* スコアボード */
         .grid-4-teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
         .team-mini-card { background: #fff; border-radius: 18px; padding: 16px 12px; text-align: center; border: 2px solid #e2e8f0; position: relative; overflow: hidden; }
         .team-mini-card.winner { border-color: #f59e0b; background: linear-gradient(135deg, #fff 0%, #fef3c7 100%); transform: scale(1.02); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2); }
@@ -230,7 +230,7 @@
         .forum-input-card { background: #f8fafc; border-radius: 16px; padding: 16px; margin-bottom: 18px; border: 1px solid #e2e8f0; }
         .forum-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         @media (max-width: 600px) { .forum-form-grid { grid-template-columns: 1fr; } }
-        .forum-list { display: flex; flex-direction: column; gap: 10px; }
+        .forum-list { display: flex; flex-direction: column; gap: 12px; }
         .forum-post { background: #fff; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; border-left: 5px solid var(--accent-blue); }
         .forum-post.status-done { border-left-color: var(--accent-green); background: #f6fbf7; }
         .forum-post-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
@@ -275,15 +275,6 @@
 <!-- アプリヘッダー -->
 <div class="app-header">
     <div class="brand-title">🔥 花見川 VS 八千代組 パフォーマンスHUB</div>
-
-    <!-- 📱 閲覧専用モードスイッチ -->
-    <div class="toggle-wrapper" style="background:#e2e8f0;">
-        <span style="font-size:12px; font-weight:900;">📱 閲覧モード:</span>
-        <label class="switch">
-            <input type="checkbox" id="readOnlyToggle" onchange="toggleReadOnlyMode(this.checked)">
-            <span class="slider"></span>
-        </label>
-    </div>
 
     <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchPage('entryPage')">📝 日別入力</button>
@@ -1335,7 +1326,7 @@ function renderFlowerPage() {
     teamBody.innerHTML = teamHTML;
 }
 
-// ---------------- 6. みんなのご意見箱 ----------------
+// ---------------- 6. みんなのご意見箱 & 管理者機能 & AIプロンプト出力 ----------------
 function renderForumPage() {
     const container = document.getElementById('forumListContainer');
     container.innerHTML = '';
@@ -1638,8 +1629,6 @@ function clearAllData() {
 // 🌐 自動URL判定: URLが "/view" の場合は自動的に閲覧専用モードにする
 if (window.location.pathname.endsWith('/view')) {
     toggleReadOnlyMode(true);
-    const readOnlySwitch = document.getElementById('readOnlyToggle');
-    if (readOnlySwitch) readOnlySwitch.checked = true;
 }
 
 // 初期化起動
