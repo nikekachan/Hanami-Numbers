@@ -57,6 +57,7 @@
         body.read-only-mode .btn-danger-all,
         body.read-only-mode .btn-clear-item,
         body.read-only-mode .btn-gold,
+        body.read-only-mode .btn-save,
         body.read-only-mode .forum-input-card,
         body.read-only-mode .admin-action-bar {
             display: none !important;
@@ -104,6 +105,7 @@
         .btn { padding: 9px 15px; font-size: 13px; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
         .btn-style { background: #0f172a; color: #fff; }
+        .btn-save { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
         .btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
         .btn-pink { background: linear-gradient(135deg, #ec4899, #db2777); color: #fff; }
         .btn-green { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
@@ -143,7 +145,7 @@
         }
         .btn-clear-item:hover { background: #fca5a5; color: #7f1d1d; }
 
-        /* コンパクトバッジ表示 */
+        /* コンパクトバッジ表示（折れ曲がり防止） */
         .members-row { display: flex; flex-wrap: wrap; gap: 5px; }
         .member-badge { 
             display: inline-flex; align-items: center; gap: 5px; 
@@ -166,7 +168,7 @@
         .chart-container { position: relative; width: 100%; height: 350px; cursor: pointer; }
         @media (max-width: 600px) { .chart-container { height: 300px; } }
 
-        /* スコアボード */
+        /* チーム4つ並びスコアボード */
         .grid-4-teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
         .team-mini-card { background: #fff; border-radius: 18px; padding: 16px 12px; text-align: center; border: 2px solid #e2e8f0; position: relative; overflow: hidden; }
         .team-mini-card.winner { border-color: #f59e0b; background: linear-gradient(135deg, #fff 0%, #fef3c7 100%); transform: scale(1.02); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2); }
@@ -228,8 +230,8 @@
         .forum-input-card { background: #f8fafc; border-radius: 16px; padding: 16px; margin-bottom: 18px; border: 1px solid #e2e8f0; }
         .forum-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         @media (max-width: 600px) { .forum-form-grid { grid-template-columns: 1fr; } }
-        .forum-list { display: flex; flex-direction: column; gap: 12px; }
-        .forum-post { background: #fff; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 14px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; border-left: 5px solid var(--accent-blue); }
+        .forum-list { display: flex; flex-direction: column; gap: 10px; }
+        .forum-post { background: #fff; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; border-left: 5px solid var(--accent-blue); }
         .forum-post.status-done { border-left-color: var(--accent-green); background: #f6fbf7; }
         .forum-post-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
         
@@ -274,7 +276,7 @@
 <div class="app-header">
     <div class="brand-title">🔥 花見川 VS 八千代組 パフォーマンスHUB</div>
 
-    <!-- 📱 閲覧専用モード（誤操作防止スイッチ） -->
+    <!-- 📱 閲覧専用モードスイッチ -->
     <div class="toggle-wrapper" style="background:#e2e8f0;">
         <span style="font-size:12px; font-weight:900;">📱 閲覧モード:</span>
         <label class="switch">
@@ -356,7 +358,6 @@
         </div>
     </div>
 
-    <!-- メンバー選択エリア -->
     <div class="glass-panel">
         <div style="font-size: 13px; font-weight: 800; margin-bottom: 8px;">👥 比較するメンバーを選択</div>
         <div style="margin-bottom: 8px;">
@@ -366,7 +367,6 @@
         <div class="members-row" id="memberCheckboxes"></div>
     </div>
 
-    <!-- 商材選択エリア -->
     <div class="glass-panel">
         <div style="font-size: 13px; font-weight: 800; margin-bottom: 8px;">📦 比較表示する商材を選択</div>
         <div style="margin-bottom: 8px;">
@@ -395,7 +395,7 @@
     </div>
 </div>
 
-<!-- PAGE 3: チーム点数対抗 (花見川 VS 八千代組) -->
+<!-- PAGE 3: チーム点数対抗 -->
 <div id="pointsPage" class="page-content">
     <div class="battle-arena-wrapper" id="pointsArenaWrap">
         <span class="copy-hint">💡 結果長押しで画像コピー</span>
@@ -470,7 +470,6 @@
         <div class="flower-canvas" id="flowerGardenCanvas"></div>
     </div>
 
-    <!-- 個人進捗表 ＆ チーム進捗表（1枚統合画像コピー） -->
     <div class="excel-style-combined-wrap" id="eventCombinedTableWrap" style="position:relative; cursor:pointer;">
         <span class="copy-hint">💡 長押しで個人＆チーム表をまとめて画像コピー</span>
 
@@ -1336,7 +1335,7 @@ function renderFlowerPage() {
     teamBody.innerHTML = teamHTML;
 }
 
-// ---------------- 6. みんなのご意見箱 & 管理者機能 & AIプロンプト出力 ----------------
+// ---------------- 6. みんなのご意見箱 ----------------
 function renderForumPage() {
     const container = document.getElementById('forumListContainer');
     container.innerHTML = '';
@@ -1371,7 +1370,6 @@ function renderForumPage() {
             <div style="font-size:13px; font-weight:700; color:var(--text-main); white-space:pre-wrap;">${post.text}${ideaText}</div>
             ${replyHtml}
 
-            <!-- 管理者アクションバー（パスワード認証） -->
             <div class="admin-action-bar">
                 <button class="btn-mini-admin btn-green" onclick="togglePostStatus(${post.id})">✅ ${isDone ? '未対応に戻す' : '適用済みにする'}</button>
                 <button class="btn-mini-admin btn-style" onclick="replyToPost(${post.id})">💬 返信</button>
@@ -1422,7 +1420,6 @@ function submitForumPost() {
     renderForumPage();
 }
 
-// 🔒 管理者機能：適用済みステータス切替（パスワード: hanami364）
 function togglePostStatus(postId) {
     const pass = prompt("🔐 管理者パスワードを入力してください:");
     if (pass === null) return;
@@ -1439,7 +1436,6 @@ function togglePostStatus(postId) {
     }
 }
 
-// 🔒 管理者機能：管理者返信コメント追加（パスワード: hanami364）
 function replyToPost(postId) {
     const pass = prompt("🔐 管理者パスワードを入力してください:");
     if (pass === null) return;
@@ -1459,7 +1455,6 @@ function replyToPost(postId) {
     }
 }
 
-// 🔒 管理者機能：投稿削除（パスワード: hanami364）
 function deleteForumPost(postId) {
     const pass = prompt("🔐 管理者パスワードを入力してください:");
     if (pass === null) return;
@@ -1475,7 +1470,6 @@ function deleteForumPost(postId) {
     }
 }
 
-// 🤖 AI自動改修用プロンプト文一括出力＆コピー
 function exportForumForAI() {
     if (!storeData.forum || storeData.forum.length === 0) {
         alert("分析対象の投稿データがまだありません。");
@@ -1639,6 +1633,13 @@ function clearAllData() {
     } else {
         alert("❌ パスワードが違います。");
     }
+}
+
+// 🌐 自動URL判定: URLが "/view" の場合は自動的に閲覧専用モードにする
+if (window.location.pathname.endsWith('/view')) {
+    toggleReadOnlyMode(true);
+    const readOnlySwitch = document.getElementById('readOnlyToggle');
+    if (readOnlySwitch) readOnlySwitch.checked = true;
 }
 
 // 初期化起動
