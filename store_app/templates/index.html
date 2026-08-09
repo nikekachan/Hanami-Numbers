@@ -52,6 +52,21 @@
             max-width: 1350px; margin-left: auto; margin-right: auto; min-height: 100vh;
         }
 
+        /* 閲覧専用モード制御スタイル */
+        body.read-only-mode .btn-danger,
+        body.read-only-mode .btn-danger-all,
+        body.read-only-mode .btn-clear-item,
+        body.read-only-mode .btn-gold,
+        body.read-only-mode .forum-input-card,
+        body.read-only-mode .admin-action-bar {
+            display: none !important;
+        }
+
+        body.read-only-mode .member-badge {
+            cursor: default !important;
+            box-shadow: none !important;
+        }
+
         /* ヘッダー & ナビゲーション */
         .app-header {
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
@@ -78,7 +93,6 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
         @keyframes brandShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        @keyframes rowIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
         .glass-panel { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; padding: 18px; margin-bottom: 18px; box-shadow: var(--shadow-card); }
         .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
@@ -129,7 +143,7 @@
         }
         .btn-clear-item:hover { background: #fca5a5; color: #7f1d1d; }
 
-        /* コンパクトバッジ表示（折れ曲がり防止） */
+        /* コンパクトバッジ表示 */
         .members-row { display: flex; flex-wrap: wrap; gap: 5px; }
         .member-badge { 
             display: inline-flex; align-items: center; gap: 5px; 
@@ -148,11 +162,11 @@
 
         .count-val { background: #ffffff; padding: 1px 5px; border-radius: 8px; font-size: 10px; font-weight: 900; border: 1px solid rgba(0,0,0,0.1); }
 
-        /* スマホ対応グラフコンテナ（つぶれ防止） */
+        /* スマホ対応グラフコンテナ */
         .chart-container { position: relative; width: 100%; height: 350px; cursor: pointer; }
         @media (max-width: 600px) { .chart-container { height: 300px; } }
 
-        /* チーム4つ並びスコアボード */
+        /* スコアボード */
         .grid-4-teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
         .team-mini-card { background: #fff; border-radius: 18px; padding: 16px 12px; text-align: center; border: 2px solid #e2e8f0; position: relative; overflow: hidden; }
         .team-mini-card.winner { border-color: #f59e0b; background: linear-gradient(135deg, #fff 0%, #fef3c7 100%); transform: scale(1.02); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2); }
@@ -188,7 +202,7 @@
         }
         .team-vs-card.winner .winner-crown, .team-mini-card.winner .winner-crown { display: block; }
 
-        /* イベント・まとめ共有画像用テーブルスタイル */
+        /* イベント・まとめ共有画像用テーブル */
         .excel-style-combined-wrap {
             background: #ffffff; border-radius: 16px; padding: 18px; border: 2px solid #000; box-shadow: var(--shadow-card); margin-bottom: 20px;
         }
@@ -214,12 +228,30 @@
         .forum-input-card { background: #f8fafc; border-radius: 16px; padding: 16px; margin-bottom: 18px; border: 1px solid #e2e8f0; }
         .forum-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         @media (max-width: 600px) { .forum-form-grid { grid-template-columns: 1fr; } }
-        .forum-list { display: flex; flex-direction: column; gap: 10px; }
-        .forum-post { background: #fff; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; border-left: 5px solid var(--accent-blue); }
+        .forum-list { display: flex; flex-direction: column; gap: 12px; }
+        .forum-post { background: #fff; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 14px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; border-left: 5px solid var(--accent-blue); }
+        .forum-post.status-done { border-left-color: var(--accent-green); background: #f6fbf7; }
         .forum-post-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
+        
         .tag-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 900; background: #e2e8f0; color: #334155; }
         .tag-prio-高 { background: #fee2e2; color: #991b1b; }
         .tag-prio-中 { background: #fef3c7; color: #92400e; }
+        
+        .status-badge { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 900; }
+        .status-badge.status-open { background: #fef3c7; color: #92400e; }
+        .status-badge.status-completed { background: #d1fae5; color: #065f46; }
+
+        .admin-reply-box {
+            margin-top: 10px; padding: 10px 12px; background: #eff6ff; border-radius: 10px; border-left: 4px solid var(--accent-blue);
+            font-size: 12px; font-weight: 700; color: #1e3a8a;
+        }
+
+        .admin-action-bar {
+            display: flex; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px dashed #cbd5e1; flex-wrap: wrap; justify-content: flex-end;
+        }
+        .btn-mini-admin {
+            padding: 3px 8px; font-size: 11px; font-weight: 800; border-radius: 8px; border: none; cursor: pointer;
+        }
 
         .table-wrap { overflow-x: auto; border-radius: 16px; background: #fff; }
         table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; }
@@ -241,6 +273,16 @@
 <!-- アプリヘッダー -->
 <div class="app-header">
     <div class="brand-title">🔥 花見川 VS 八千代組 パフォーマンスHUB</div>
+
+    <!-- 📱 閲覧専用モード（誤操作防止スイッチ） -->
+    <div class="toggle-wrapper" style="background:#e2e8f0;">
+        <span style="font-size:12px; font-weight:900;">📱 閲覧モード:</span>
+        <label class="switch">
+            <input type="checkbox" id="readOnlyToggle" onchange="toggleReadOnlyMode(this.checked)">
+            <span class="slider"></span>
+        </label>
+    </div>
+
     <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchPage('entryPage')">📝 日別入力</button>
         <button class="tab-btn" onclick="switchPage('comparePage')">📊 個人・比較分析</button>
@@ -273,7 +315,6 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
             <h2 style="font-size: 15px; margin: 0;">📈 月間実績 & 着地見込み（花見川 VS 八千代組）</h2>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <!-- 目標数値ON/OFFスイッチ -->
                 <div class="toggle-wrapper">
                     <span style="font-size:12px; font-weight:800;">目標数値表示:</span>
                     <label class="switch">
@@ -281,7 +322,6 @@
                         <span class="slider"></span>
                     </label>
                 </div>
-                <!-- 着地見込みON/OFFスイッチ -->
                 <div class="toggle-wrapper">
                     <span style="font-size:12px; font-weight:800;">着地見込み表示:</span>
                     <label class="switch">
@@ -393,7 +433,7 @@
     </div>
 </div>
 
-<!-- PAGE 4: イエナカ進捗表 (4チーム対抗) -->
+<!-- PAGE 4: イエナカ進捗表 -->
 <div id="ienakaPage" class="page-content">
     <div class="battle-arena-wrapper" id="ienakaArenaWrap">
         <span class="copy-hint">💡 進捗結果長押しで画像コピー</span>
@@ -415,7 +455,7 @@
     </div>
 </div>
 
-<!-- PAGE 5: 菊・蓮・薔薇イベント画面 (個人＆チーム統合コピー対応) -->
+<!-- PAGE 5: 菊・蓮・薔薇イベント画面 -->
 <div id="flowerPage" class="page-content">
     <div class="flower-garden-box" id="flowerBoxWrap" style="position:relative; cursor:pointer;">
         <span class="copy-hint">💡 長押しで画像コピー</span>
@@ -430,11 +470,10 @@
         <div class="flower-canvas" id="flowerGardenCanvas"></div>
     </div>
 
-    <!-- 個人進捗表 ＆ チーム進捗表（1枚の画像として一体長押しコピー） -->
+    <!-- 個人進捗表 ＆ チーム進捗表（1枚統合画像コピー） -->
     <div class="excel-style-combined-wrap" id="eventCombinedTableWrap" style="position:relative; cursor:pointer;">
         <span class="copy-hint">💡 長押しで個人＆チーム表をまとめて画像コピー</span>
 
-        <!-- 個人進捗表 -->
         <div class="excel-style-table-wrap">
             <div class="excel-table-title">個人進捗表</div>
             <table class="excel-table">
@@ -452,7 +491,6 @@
             </table>
         </div>
 
-        <!-- チーム進捗表 -->
         <div class="excel-style-table-wrap" style="margin-bottom:0;">
             <div class="excel-table-title">チーム進捗表</div>
             <table class="excel-table">
@@ -471,13 +509,12 @@
     </div>
 </div>
 
-<!-- PAGE 6: みんなのご意見箱（AI丸投げテキスト出力対応） -->
+<!-- PAGE 6: みんなのご意見箱 -->
 <div id="forumPage" class="page-content">
     <div class="glass-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
             <h2 style="font-size: 17px; margin:0; color:var(--accent-pink);">📮 みんなのご意見箱・社内掲示板</h2>
-            <!-- AI出力コピーボタン -->
-            <button class="btn btn-green" onclick="exportForumForAI()">🤖 AI分析用テキストを一括コピー</button>
+            <button class="btn btn-green" onclick="exportForumForAI()">🤖 AI分析・改修指示プロンプト生成</button>
         </div>
 
         <div class="forum-input-card">
@@ -510,11 +547,11 @@
     </div>
 </div>
 
-<!-- AIテキスト出力プレビューモーダル -->
+<!-- AIテキスト出力モーダル -->
 <div class="modal" id="aiExportModal">
     <div class="modal-content" style="max-width:650px;">
-        <h3 style="color: var(--accent-blue); margin-top:0;">🤖 AI分析用プロンプト出力</h3>
-        <p style="font-size:12px; color:var(--text-muted);">以下のテキストがクリップボードにコピーされました！そのままAI（ChatGPTやGemini等）に貼り付けて分析・要約させてください。</p>
+        <h3 style="color: var(--accent-blue); margin-top:0;">🤖 AI改修指示プロンプト</h3>
+        <p style="font-size:12px; color:var(--text-muted);">以下のテキストが自動コピーされました！このままGeminiやChatGPTに送信すると、要望を反映した新しいHTMLが生成されます。</p>
         <textarea id="aiExportTextArea" rows="12" style="width:100%; font-size:12px; font-family:monospace;" readonly></textarea>
         <div style="margin-top: 15px; text-align: right;">
             <button class="btn btn-style" onclick="closeAiExportModal()">閉じる</button>
@@ -577,7 +614,7 @@ const ITEM_POINTS = {
     "Google pixelハイエンド": 2
 };
 
-// メンバーマスター（1ページ目の表示名: 宗廣＝「ム」）
+// メンバーマスター
 const ALL_MEMBERS_MASTER = [
     // 花見川 - 新山口
     { name: "大熊 百合香", display: "大熊", shortTeam: "大熊", team: "新山口", group: "花見川" },
@@ -616,6 +653,7 @@ let currentDate = new Date().toISOString().split('T')[0];
 let currentMonth = currentDate.substring(0, 7);
 let storeData = { daily: {}, targets: {}, forum: [] };
 let viewMode = 'individual';
+let isReadOnly = false;
 
 let selectedMembersForCompare = ALL_MEMBERS_MASTER.map(m => m.name);
 let selectedItemsForCompare = [...ITEMS];
@@ -623,6 +661,18 @@ let selectedItemsForCompare = [...ITEMS];
 let mainChartInstance = null;
 let compareChartInstance = null;
 let confettiTriggered = false;
+
+// 📱 閲覧専用モード制御
+function toggleReadOnlyMode(checked) {
+    isReadOnly = checked;
+    if (checked) {
+        document.body.classList.add('read-only-mode');
+        showToastMsg("📱 閲覧専用モードに切り替えました");
+    } else {
+        document.body.classList.remove('read-only-mode');
+        showToastMsg("✏️ 入力可能モードに切り替えました");
+    }
+}
 
 function switchPage(pageId) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -810,6 +860,7 @@ function renderUI() {
             ALL_MEMBERS_MASTER.forEach(m => {
                 const count = dayData[item][m.name] || 0;
                 const badge = createBadge(m.display, m.name, count, m.team, (newVal) => {
+                    if (isReadOnly) return;
                     storeData.daily[currentDate][item][m.name] = newVal;
                     saveDataToServer();
                 });
@@ -828,7 +879,6 @@ function renderUI() {
     });
 }
 
-// 長押し確認ポップアップを削除し、直接0リセットされるバッジ生成
 function createBadge(displayName, fullName, count, teamName, onChange) {
     const btn = document.createElement('div');
     btn.className = `member-badge ${BADGE_CLASSES[teamName]}`;
@@ -836,18 +886,19 @@ function createBadge(displayName, fullName, count, teamName, onChange) {
 
     let timer = null, isLongPress = false;
     const startPress = () => {
+        if (isReadOnly) return;
         isLongPress = false;
         timer = setTimeout(() => {
             isLongPress = true;
-            onChange(0); // ポップアップを出さずに即時0リセット
+            onChange(0);
             showToastMsg(`↺ ${fullName} さんのカウントを0にリセットしました`);
         }, 700);
     };
 
     btn.addEventListener('mousedown', startPress);
-    btn.addEventListener('mouseup', () => { clearTimeout(timer); if (!isLongPress) onChange(count + 1); });
+    btn.addEventListener('mouseup', () => { clearTimeout(timer); if (!isLongPress && !isReadOnly) onChange(count + 1); });
     btn.addEventListener('touchstart', startPress, { passive: true });
-    btn.addEventListener('touchend', (e) => { clearTimeout(timer); if (!isLongPress) { e.preventDefault(); onChange(count + 1); } });
+    btn.addEventListener('touchend', (e) => { clearTimeout(timer); if (!isLongPress && !isReadOnly) { e.preventDefault(); onChange(count + 1); } });
 
     return btn;
 }
@@ -866,7 +917,6 @@ function toggleView() {
     renderUI();
 }
 
-// グラフ描画（目標ライン＆着地見込みトグル連動、アニメーション無効化でコピーズレ解消）
 function updateMainChart() {
     const showTarget = document.getElementById('targetToggle').checked;
     const showForecast = document.getElementById('forecastToggle').checked;
@@ -896,7 +946,6 @@ function updateMainChart() {
 
     const datasets = [];
 
-    // 目標ライン表示トグル
     if (showTarget) {
         datasets.push({ type: 'line', label: '🎯 目標数値', data: targetData, borderColor: '#f59e0b', borderWidth: 3, fill: false });
     }
@@ -904,7 +953,6 @@ function updateMainChart() {
     datasets.push({ label: '花見川チーム (実績)', data: hanamigawaActuals, backgroundColor: '#2563eb' });
     datasets.push({ label: '八千代組 (実績)', data: yachiyoActuals, backgroundColor: '#ef4444' });
 
-    // 着地見込み表示トグル
     if (showForecast) {
         datasets.push({ label: '花見川チーム (着地見込み)', data: hanamigawaForecasts, backgroundColor: 'rgba(37, 99, 235, 0.3)', borderColor: '#2563eb', borderWidth: 1 });
         datasets.push({ label: '八千代組 (着地見込み)', data: yachiyoForecasts, backgroundColor: 'rgba(239, 68, 68, 0.3)', borderColor: '#ef4444', borderWidth: 1 });
@@ -919,7 +967,7 @@ function updateMainChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: false, // キャプチャ時初期フレーム固定の防止
+            animation: false,
             scales: { y: { beginAtZero: true } }
         }
     });
@@ -1133,7 +1181,7 @@ function renderPointsPage() {
     body.innerHTML = bodyHTML;
 }
 
-// ---------------- 4. イエナカ進捗表 (4チーム対抗) ----------------
+// ---------------- 4. イエナカ進捗表 ----------------
 function renderIenakaPage() {
     const summary = calculateMonthlySummary(currentMonth);
     const totals = summary.totalCounts;
@@ -1197,7 +1245,7 @@ function renderIenakaPage() {
     body.innerHTML = bodyHTML;
 }
 
-// ---------------- 5. 菊・蓮・薔薇イベント画面 (個人＆チーム統合コピー対応) ----------------
+// ---------------- 5. 菊・蓮・薔薇イベント画面 ----------------
 function renderFlowerPage() {
     const summary = calculateMonthlySummary(currentMonth);
     const totals = summary.totalCounts;
@@ -1288,7 +1336,7 @@ function renderFlowerPage() {
     teamBody.innerHTML = teamHTML;
 }
 
-// ---------------- 6. みんなのご意見箱 & 🤖 AI一括分析テキスト出力 ----------------
+// ---------------- 6. みんなのご意見箱 & 管理者機能 & AIプロンプト出力 ----------------
 function renderForumPage() {
     const container = document.getElementById('forumListContainer');
     container.innerHTML = '';
@@ -1300,10 +1348,15 @@ function renderForumPage() {
 
     [...storeData.forum].reverse().forEach((post) => {
         const card = document.createElement('div');
-        card.className = 'forum-post';
+        const isDone = post.status === '適用済み';
+        card.className = `forum-post ${isDone ? 'status-done' : ''}`;
+
         const category = post.category || 'その他';
         const priority = post.priority || '中';
         const ideaText = post.idea ? `\n💡 改善案: ${post.idea}` : '';
+        const statusText = post.status || '未対応';
+        const statusClass = isDone ? 'status-completed' : 'status-open';
+        const replyHtml = post.reply ? `<div class="admin-reply-box">💬 <b>管理者返信:</b> ${post.reply}</div>` : '';
 
         card.innerHTML = `
             <div class="forum-post-header">
@@ -1311,10 +1364,19 @@ function renderForumPage() {
                     <span>👤 投稿者: ${post.name}</span>
                     <span class="tag-badge" style="margin-left:6px;">${category}</span>
                     <span class="tag-badge tag-prio-${priority}" style="margin-left:4px;">優先度: ${priority}</span>
+                    <span class="status-badge ${statusClass}" style="margin-left:6px;">${statusText}</span>
                 </div>
                 <span>📅 ${post.date}</span>
             </div>
             <div style="font-size:13px; font-weight:700; color:var(--text-main); white-space:pre-wrap;">${post.text}${ideaText}</div>
+            ${replyHtml}
+
+            <!-- 管理者アクションバー（パスワード認証） -->
+            <div class="admin-action-bar">
+                <button class="btn-mini-admin btn-green" onclick="togglePostStatus(${post.id})">✅ ${isDone ? '未対応に戻す' : '適用済みにする'}</button>
+                <button class="btn-mini-admin btn-style" onclick="replyToPost(${post.id})">💬 返信</button>
+                <button class="btn-mini-admin btn-danger" onclick="deleteForumPost(${post.id})">🗑 削除</button>
+            </div>
         `;
         container.appendChild(card);
     });
@@ -1345,6 +1407,8 @@ function submitForumPost() {
         priority: priority,
         idea: idea,
         text: text,
+        status: '未対応',
+        reply: '',
         date: new Date().toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
     };
 
@@ -1358,7 +1422,60 @@ function submitForumPost() {
     renderForumPage();
 }
 
-// 🤖 蓄積された意見・要望をAI分析用テキストとして整形＆コピー
+// 🔒 管理者機能：適用済みステータス切替（パスワード: hanami364）
+function togglePostStatus(postId) {
+    const pass = prompt("🔐 管理者パスワードを入力してください:");
+    if (pass === null) return;
+    if (pass === AUTH_PASS) {
+        const post = storeData.forum.find(p => p.id === postId);
+        if (post) {
+            post.status = (post.status === '適用済み') ? '未対応' : '適用済み';
+            saveDataToServer();
+            showToastMsg(`ステータスを「${post.status}」に変更しました`);
+            renderForumPage();
+        }
+    } else {
+        alert("❌ パスワードが違います。");
+    }
+}
+
+// 🔒 管理者機能：管理者返信コメント追加（パスワード: hanami364）
+function replyToPost(postId) {
+    const pass = prompt("🔐 管理者パスワードを入力してください:");
+    if (pass === null) return;
+    if (pass === AUTH_PASS) {
+        const post = storeData.forum.find(p => p.id === postId);
+        if (post) {
+            const replyMsg = prompt("管理者からの返信コメントを入力してください:", post.reply || "");
+            if (replyMsg !== null) {
+                post.reply = replyMsg.trim();
+                saveDataToServer();
+                showToastMsg("管理者返信を更新しました");
+                renderForumPage();
+            }
+        }
+    } else {
+        alert("❌ パスワードが違います。");
+    }
+}
+
+// 🔒 管理者機能：投稿削除（パスワード: hanami364）
+function deleteForumPost(postId) {
+    const pass = prompt("🔐 管理者パスワードを入力してください:");
+    if (pass === null) return;
+    if (pass === AUTH_PASS) {
+        if (confirm("この投稿を削除しますか？")) {
+            storeData.forum = storeData.forum.filter(p => p.id !== postId);
+            saveDataToServer();
+            showToastMsg("🗑 投稿を削除しました");
+            renderForumPage();
+        }
+    } else {
+        alert("❌ パスワードが違います。");
+    }
+}
+
+// 🤖 AI自動改修用プロンプト文一括出力＆コピー
 function exportForumForAI() {
     if (!storeData.forum || storeData.forum.length === 0) {
         alert("分析対象の投稿データがまだありません。");
@@ -1377,24 +1494,21 @@ function exportForumForAI() {
         promptText += `・投稿者名: ${post.name}\n`;
         promptText += `・カテゴリ: ${post.category || 'その他'}\n`;
         promptText += `・優先度: ${post.priority || '中'}\n`;
-        promptText += `・要件・課題: ${post.text}\n`;
-        if (post.idea) promptText += `・現場からの改善案アイデア: ${post.idea}\n`;
+        promptText += `・ステータス: ${post.status || '未対応'}\n`;
+        promptText += `・要件・お困りごと: ${post.text}\n`;
+        if (post.idea) promptText += `・現場からの改善アイデア: ${post.idea}\n`;
+        if (post.reply) promptText += `・管理者返信: ${post.reply}\n`;
     });
 
     promptText += `\n========================\n`;
     promptText += `【AI指示・プロンプト】\n`;
-    promptText += `上記のスタッフからの投稿データを分析し、以下のフォーマットで整理・要約・提案を行ってください：\n`;
-    promptText += `1. 現場の主要課題トップ3（緊急度・頻度の高いもの）\n`;
-    promptText += `2. カテゴリ別の傾向と対策アドバイス\n`;
-    promptText += `3. 今すぐ実行すべき具体的なアクションプラン（現場の改善案も考慮）\n`;
+    promptText += `上記のスタッフからの投稿データを分析し、以下のフォーマットでHTMLの再構成をお願いします。不満・要望・機能追加リクエスト（特に未対応のもの）をすべて反映した完全な HTML コード（index.html）を生成してください。`;
 
-    // モーダルへセット
     document.getElementById('aiExportTextArea').value = promptText;
     document.getElementById('aiExportModal').style.display = 'flex';
 
-    // クリップボードへ自動コピー
     navigator.clipboard.writeText(promptText).then(() => {
-        showToastMsg("🤖 AI分析用テキストをコピーしました！");
+        showToastMsg("🤖 AI改修指示プロンプトをコピーしました！");
     }).catch(() => {});
 }
 
@@ -1414,7 +1528,7 @@ function triggerConfetti() {
     }
 }
 
-// アニメーション完了フレームを確実に画像コピーするロジック
+// キャプチャ機能
 function setupChartCopy(wrapId, chartInstanceGetter) {
     const wrap = document.getElementById(wrapId);
     let timer = null;
@@ -1535,7 +1649,7 @@ setupChartCopy('compareChartWrap', () => compareChartInstance);
 setupArenaCopy('pointsArenaWrap');
 setupArenaCopy('ienakaArenaWrap');
 setupArenaCopy('flowerBoxWrap');
-setupArenaCopy('eventCombinedTableWrap'); // 統合画像コピー
+setupArenaCopy('eventCombinedTableWrap');
 </script>
 </body>
 </html>
