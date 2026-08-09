@@ -140,7 +140,7 @@
         }
         .btn-clear-item:hover { background: #fca5a5; color: #7f1d1d; }
 
-        /* コンパクトバッジ表示（高速タップ対応） */
+        /* コンパクトバッジ表示 */
         .members-row { display: flex; flex-wrap: wrap; gap: 5px; }
         .member-badge { 
             display: inline-flex; align-items: center; gap: 5px; 
@@ -294,7 +294,7 @@
                 <span>📅 日付選択:</span>
                 <input type="date" id="datePicker">
             </div>
-            <button class="btn btn-save" onclick="saveDataToServer()">💾 サーバーに保存</button>
+            <button class="btn btn-save" onclick="saveDataToServer(false)">💾 サーバーに保存</button>
             <button class="btn btn-style" id="viewToggleBtn" onclick="toggleView()">👀 表示切り替え: 個人別</button>
             <button class="btn btn-gold" onclick="openTargetModal()">🎯 月間目標設定</button>
             <button class="btn btn-danger" onclick="clearCurrentDateData()">🗑 本日分クリア</button>
@@ -388,7 +388,7 @@
     </div>
 </div>
 
-<!-- PAGE 3: チーム点数対抗 -->
+<!-- PAGE 3: チーム点数対抗 (花見川 VS 八千代組) -->
 <div id="pointsPage" class="page-content">
     <div class="battle-arena-wrapper" id="pointsArenaWrap">
         <span class="copy-hint">💡 結果長押しで画像コピー</span>
@@ -578,7 +578,7 @@
 <div class="toast" id="copyToast">📋 クリップボードに画像をコピーしました！</div>
 
 <script>
-const AUTH_PASS = "hanami364"; // 保護用パスワード
+const AUTH_PASS = "hanami364"; // パスワード
 
 // 商材順序マスター
 const ITEMS = [
@@ -667,15 +667,23 @@ let mainChartInstance = null;
 let compareChartInstance = null;
 let confettiTriggered = false;
 
+// ⏱ 自動保存（5秒後バックグラウンド保存）用タイマー
+let autoSaveTimer = null;
+
+function triggerAutoSave() {
+    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+        saveDataToServer(true); // 5秒操作がなかったらサイレント自動保存
+    }, 5000);
+}
+
 // 📱 閲覧専用モード制御
 function toggleReadOnlyMode(checked) {
     isReadOnly = checked;
     if (checked) {
         document.body.classList.add('read-only-mode');
-        showToastMsg("📱 閲覧専用モードに切り替えました");
     } else {
         document.body.classList.remove('read-only-mode');
-        showToastMsg("✏️ 入力可能モードに切り替えました");
     }
 }
 
@@ -718,7 +726,8 @@ async function loadStoreDataFromServer() {
     }
 }
 
-async function saveDataToServer() {
+async function saveDataToServer(silent = false) {
+    if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
     localStorage.setItem('store_performance_vs_yachiyo_v5', JSON.stringify(storeData));
     try {
         const res = await fetch('/api/save_all_data', {
@@ -727,11 +736,11 @@ async function saveDataToServer() {
             body: JSON.stringify(storeData)
         });
         const result = await res.json();
-        showToastMsg(result.message || "☁️ サーバーへ保存しました");
+        if (!silent) showToastMsg(result.message || "☁️ サーバーへ保存しました");
         renderUI();
         updateMainChart();
     } catch (e) {
-        showToastMsg("⚠️ サーバー接続エラー（ローカル保存完了）");
+        if (!silent) showToastMsg("⚠️ サーバー接続エラー（ローカル保存完了）");
         renderUI();
         updateMainChart();
     }
@@ -766,7 +775,6 @@ function getDayData(dateStr) {
     return dayObj;
 }
 
-// 経過日数（何日目）に基づく正確な着地見込み＆達成率計算ロジック
 function calculateMonthlySummary(monthStr) {
     const daily = storeData.daily;
     const year = parseInt(monthStr.split('-')[0], 10);
@@ -801,7 +809,6 @@ function calculateMonthlySummary(monthStr) {
         forecastCounts[item] = {};
         ALL_MEMBERS_MASTER.forEach(m => {
             const act = totalCounts[item][m.name];
-            // （（現状の件数 / 何日目）× 月の総日数）
             forecastCounts[item][m.name] = Math.round((act / daysPassed) * totalDaysInMonth * 10) / 10;
         });
     });
@@ -831,20 +838,18 @@ function renderUI() {
         const targetVal = storeData.targets[item] || 0;
         const actProgress = targetVal > 0 ? ((totalAct / targetVal) * 100).toFixed(1) : '0.0';
         
-        // （（現状の件数/何日目×月の総日数/目標数）×100）％の見込み計算（投稿 #2）
         const fcastProgressRate = targetVal > 0 ? ((totalFcast / targetVal) * 100) : 0;
         const fcastProgressStr = targetVal > 0 ? fcastProgressRate.toFixed(1) : '0.0';
 
-        // 達成率は100％を基準（100%未満＝赤、100%以上＝緑）（投稿 #3）
         let levelClass = '';
         let badgeLvlClass = 'lvl-normal';
 
         if (targetVal > 0) {
             if (fcastProgressRate >= 100) {
-                levelClass = 'level-complete'; // 上回ったら緑っぽく
+                levelClass = 'level-complete';
                 badgeLvlClass = 'lvl-complete';
             } else {
-                levelClass = 'level-0'; // 下回ったら赤
+                levelClass = 'level-0';
                 badgeLvlClass = 'lvl-0';
             }
         }
@@ -873,7 +878,9 @@ function renderUI() {
                 const badge = createBadge(m.display, m.name, count, m.team, (newVal) => {
                     if (isReadOnly) return;
                     storeData.daily[currentDate][item][m.name] = newVal;
-                    saveDataToServer();
+                    renderUI();
+                    updateMainChart();
+                    triggerAutoSave(); // カウント更新時は5秒後にサイレント自動保存（トーストポップアップ非表示）
                 });
                 row.appendChild(badge);
             });
@@ -890,7 +897,7 @@ function renderUI() {
     });
 }
 
-// 連続ポチポチタップの応答性向上（投稿 #1 対応）
+// 高速ぽちぽちタップ対応（ポップアップ通知なし、直接数値更新）
 function createBadge(displayName, fullName, count, teamName, onChange) {
     const btn = document.createElement('div');
     btn.className = `member-badge ${BADGE_CLASSES[teamName]}`;
@@ -904,7 +911,6 @@ function createBadge(displayName, fullName, count, teamName, onChange) {
         timer = setTimeout(() => {
             isLongPress = true;
             onChange(0);
-            showToastMsg(`↺ ${fullName} さんのカウントを0にリセットしました`);
         }, 650);
     };
 
@@ -1357,7 +1363,7 @@ function renderFlowerPage() {
     teamBody.innerHTML = teamHTML;
 }
 
-// ---------------- 6. みんなのご意見箱（複数削除＆パスワード不要対応投稿 #3） ----------------
+// ---------------- 6. みんなのご意見箱 ----------------
 function setForumFilter(filterType, btnEl) {
     currentForumFilter = filterType;
     document.querySelectorAll('.forum-filter-btn').forEach(b => b.classList.remove('active'));
@@ -1498,7 +1504,6 @@ function replyToPost(postId) {
     }
 }
 
-// 個別削除：パスワード不要・ポップアップ確認のみ（投稿 #3 対応）
 function deleteForumPost(postId) {
     if (confirm("この投稿を削除しますか？")) {
         storeData.forum = storeData.forum.filter(p => p.id !== postId);
@@ -1508,7 +1513,6 @@ function deleteForumPost(postId) {
     }
 }
 
-// チェックボックス選択項目の複数一括削除（パスワード不要・ポップアップ確認のみ）（投稿 #3 対応）
 function deleteSelectedForumPosts() {
     const checkedCbs = document.querySelectorAll('.forum-select-cb:checked');
     if (checkedCbs.length === 0) {
@@ -1525,7 +1529,7 @@ function deleteSelectedForumPosts() {
     }
 }
 
-// 🤖 選択中のフィルター範囲内でAI分析用プロンプト出力（投稿 #2 対応）
+// 選択中の範囲（未対応／適用済み／すべて）内でAI分析用プロンプト出力
 function exportForumForAI() {
     if (!storeData.forum || storeData.forum.length === 0) {
         alert("分析対象の投稿データがまだありません。");
