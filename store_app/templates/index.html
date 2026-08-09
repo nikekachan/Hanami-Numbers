@@ -120,22 +120,16 @@
         input:checked + .slider { background-color: var(--accent-blue); }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        /* 商材カード */
+        /* 商材カード (100%基準の色分け：未満は赤、100%以上は緑) */
         .item-card { background: #fff; border: 2px solid var(--panel-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-card); transition: all 0.3s; }
         .item-card.level-0 { background: #fef2f2; border-color: #fca5a5; }
-        .item-card.level-1 { background: #f6fbf7; border-color: #d1fae5; }
-        .item-card.level-2 { background: #ecfdf5; border-color: #a7f3d0; }
-        .item-card.level-3 { background: #d1fae5; border-color: #6ee7b7; }
-        .item-card.level-complete { background: #eff6ff; border-color: #3b82f6; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2); }
+        .item-card.level-complete { background: #ecfdf5; border-color: #10b981; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2); }
 
         .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
         .item-title { font-size: 16px; font-weight: 900; color: #0f172a; }
         .progress-badge { font-size: 12px; font-weight: 800; padding: 5px 12px; border-radius: 20px; }
         .progress-badge.lvl-0 { background: #fee2e2; color: #991b1b; }
-        .progress-badge.lvl-1 { background: #e6f4ea; color: #166534; }
-        .progress-badge.lvl-2 { background: #dcfce7; color: #15803d; }
-        .progress-badge.lvl-3 { background: #a7f3d0; color: #065f46; }
-        .progress-badge.lvl-complete { background: #dbeafe; color: #1e40af; }
+        .progress-badge.lvl-complete { background: #d1fae5; color: #065f46; }
         .progress-badge.lvl-normal { background: #f0f9ff; color: #0284c7; }
 
         .btn-clear-item {
@@ -230,7 +224,11 @@
         .forum-input-card { background: #f8fafc; border-radius: 16px; padding: 16px; margin-bottom: 18px; border: 1px solid #e2e8f0; }
         .forum-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         @media (max-width: 600px) { .forum-form-grid { grid-template-columns: 1fr; } }
-        .forum-list { display: flex; flex-direction: column; gap: 12px; }
+        .forum-filter-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+        .forum-filter-btn { padding: 5px 12px; font-size: 12px; font-weight: 800; border-radius: 10px; border: 1px solid #cbd5e1; background: #fff; color: var(--text-muted); cursor: pointer; }
+        .forum-filter-btn.active { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
+
+        .forum-list { display: flex; flex-direction: column; gap: 10px; }
         .forum-post { background: #fff; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; border-left: 5px solid var(--accent-blue); }
         .forum-post.status-done { border-left-color: var(--accent-green); background: #f6fbf7; }
         .forum-post-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
@@ -349,6 +347,7 @@
         </div>
     </div>
 
+    <!-- メンバー選択エリア -->
     <div class="glass-panel">
         <div style="font-size: 13px; font-weight: 800; margin-bottom: 8px;">👥 比較するメンバーを選択</div>
         <div style="margin-bottom: 8px;">
@@ -358,6 +357,7 @@
         <div class="members-row" id="memberCheckboxes"></div>
     </div>
 
+    <!-- 商材選択エリア -->
     <div class="glass-panel">
         <div style="font-size: 13px; font-weight: 800; margin-bottom: 8px;">📦 比較表示する商材を選択</div>
         <div style="margin-bottom: 8px;">
@@ -386,7 +386,7 @@
     </div>
 </div>
 
-<!-- PAGE 3: チーム点数対抗 -->
+<!-- PAGE 3: チーム点数対抗 (花見川 VS 八千代組) -->
 <div id="pointsPage" class="page-content">
     <div class="battle-arena-wrapper" id="pointsArenaWrap">
         <span class="copy-hint">💡 結果長押しで画像コピー</span>
@@ -532,7 +532,16 @@
             </div>
         </div>
 
-        <h3 style="font-size: 14px; margin-top: 18px;">📋 投稿一覧</h3>
+        <!-- ご意見箱 ステータス別絞り込みタブ -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+            <h3 style="font-size: 14px; margin:0;">📋 投稿一覧</h3>
+            <div class="forum-filter-tabs">
+                <button class="forum-filter-btn active" onclick="setForumFilter('all', this)">すべて</button>
+                <button class="forum-filter-btn" onclick="setForumFilter('open', this)">未対応</button>
+                <button class="forum-filter-btn" onclick="setForumFilter('completed', this)">適用済み</button>
+            </div>
+        </div>
+
         <div class="forum-list" id="forumListContainer"></div>
     </div>
 </div>
@@ -644,6 +653,7 @@ let currentMonth = currentDate.substring(0, 7);
 let storeData = { daily: {}, targets: {}, forum: [] };
 let viewMode = 'individual';
 let isReadOnly = false;
+let currentForumFilter = 'all'; // ご意見箱フィルター状態 ('all', 'open', 'completed')
 
 let selectedMembersForCompare = ALL_MEMBERS_MASTER.map(m => m.name);
 let selectedItemsForCompare = [...ITEMS];
@@ -751,14 +761,19 @@ function getDayData(dateStr) {
     return dayObj;
 }
 
+// 修正：経過日数（何日目）を用いた精度の高い着地見込み計算ロジック
 function calculateMonthlySummary(monthStr) {
     const daily = storeData.daily;
     const year = parseInt(monthStr.split('-')[0], 10);
     const month = parseInt(monthStr.split('-')[1], 10);
     const totalDaysInMonth = new Date(year, month, 0).getDate();
     
-    const recordedDates = Object.keys(daily).filter(d => d.startsWith(monthStr) && Object.keys(daily[d]).length > 0);
-    const daysRecorded = recordedDates.length > 0 ? recordedDates.length : 1;
+    // 何日目 (選択されている日付の日番号)
+    let selectedDay = parseInt(currentDate.split('-')[2], 10) || 1;
+    if (currentDate.substring(0, 7) !== monthStr) {
+        selectedDay = totalDaysInMonth; // 過去・未来月指定時は月の総日数
+    }
+    const daysPassed = Math.max(1, Math.min(selectedDay, totalDaysInMonth));
 
     let totalCounts = {};
     ITEMS.forEach(item => {
@@ -766,7 +781,7 @@ function calculateMonthlySummary(monthStr) {
         ALL_MEMBERS_MASTER.forEach(m => { totalCounts[item][m.name] = 0; });
     });
 
-    recordedDates.forEach(d => {
+    Object.keys(daily).filter(d => d.startsWith(monthStr)).forEach(d => {
         const dayData = daily[d];
         ITEMS.forEach(item => {
             if (dayData[item]) {
@@ -782,11 +797,12 @@ function calculateMonthlySummary(monthStr) {
         forecastCounts[item] = {};
         ALL_MEMBERS_MASTER.forEach(m => {
             const act = totalCounts[item][m.name];
-            forecastCounts[item][m.name] = Math.round((act / daysRecorded) * totalDaysInMonth * 10) / 10;
+            // （（現状の件数 / 何日目）× 月の総日数）
+            forecastCounts[item][m.name] = Math.round((act / daysPassed) * totalDaysInMonth * 10) / 10;
         });
     });
 
-    return { totalCounts, forecastCounts, daysRecorded, totalDaysInMonth };
+    return { totalCounts, forecastCounts, daysPassed, totalDaysInMonth };
 }
 
 // ---------------- 1. 入力画面 ----------------
@@ -810,21 +826,22 @@ function renderUI() {
 
         const targetVal = storeData.targets[item] || 0;
         const actProgress = targetVal > 0 ? ((totalAct / targetVal) * 100).toFixed(1) : '0.0';
-        const fcastProgress = targetVal > 0 ? ((totalFcast / targetVal) * 100).toFixed(1) : '0.0';
+        
+        // （（現状の件数/何日目×月の総日数/目標数）×100）％の見込み計算
+        const fcastProgressRate = targetVal > 0 ? ((totalFcast / targetVal) * 100) : 0;
+        const fcastProgressStr = targetVal > 0 ? fcastProgressRate.toFixed(1) : '0.0';
 
+        // 達成率は100％を基準（100%未満＝赤、100%以上＝緑）
         let levelClass = '';
         let badgeLvlClass = 'lvl-normal';
 
         if (targetVal > 0) {
-            if (totalAct >= targetVal) {
-                levelClass = 'level-complete';
+            if (fcastProgressRate >= 100) {
+                levelClass = 'level-complete'; // 緑っぽく
                 badgeLvlClass = 'lvl-complete';
             } else {
-                const forecastRate = (totalFcast / targetVal) * 100;
-                if (forecastRate >= 80) { levelClass = 'level-3'; badgeLvlClass = 'lvl-3'; }
-                else if (forecastRate >= 60) { levelClass = 'level-2'; badgeLvlClass = 'lvl-2'; }
-                else if (forecastRate >= 40) { levelClass = 'level-1'; badgeLvlClass = 'lvl-1'; }
-                else { levelClass = 'level-0'; badgeLvlClass = 'lvl-0'; }
+                levelClass = 'level-0'; // 赤
+                badgeLvlClass = 'lvl-0';
             }
         }
 
@@ -836,7 +853,7 @@ function renderUI() {
             <span class="item-title">${item}</span>
             <div style="display:flex; align-items:center; gap:8px;">
                 <span class="progress-badge ${badgeLvlClass}">
-                    🎯 目標: ${targetVal} | 📊 実績: ${totalAct} (${actProgress}%) | 🔮 着地見込み: ${Math.round(totalFcast)} (${fcastProgress}%)
+                    🎯 目標: ${targetVal} | 📊 実績: ${totalAct} (${actProgress}%) | 🔮 見込み: ${Math.round(totalFcast)}件 (${fcastProgressStr}%)
                 </span>
                 <button class="btn-clear-item" onclick="clearItemData('${item}')" title="この商材の本日データをリセット">🗑 リセット</button>
             </div>
@@ -1326,7 +1343,14 @@ function renderFlowerPage() {
     teamBody.innerHTML = teamHTML;
 }
 
-// ---------------- 6. みんなのご意見箱 & 管理者機能 & AIプロンプト出力 ----------------
+// ---------------- 6. みんなのご意見箱 & フィルター切替機能 ----------------
+function setForumFilter(filterType, btnEl) {
+    currentForumFilter = filterType;
+    document.querySelectorAll('.forum-filter-btn').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+    renderForumPage();
+}
+
 function renderForumPage() {
     const container = document.getElementById('forumListContainer');
     container.innerHTML = '';
@@ -1336,7 +1360,21 @@ function renderForumPage() {
         return;
     }
 
-    [...storeData.forum].reverse().forEach((post) => {
+    let posts = [...storeData.forum].reverse();
+
+    // 未対応・適用済みの絞り込みフィルター（投稿 #4 対応）
+    if (currentForumFilter === 'open') {
+        posts = posts.filter(p => p.status !== '適用済み');
+    } else if (currentForumFilter === 'completed') {
+        posts = posts.filter(p => p.status === '適用済み');
+    }
+
+    if (posts.length === 0) {
+        container.innerHTML = '<div style="color:var(--text-muted); font-size:12px; text-align:center; padding:20px;">該当する投稿はありません。</div>';
+        return;
+    }
+
+    posts.forEach((post) => {
         const card = document.createElement('div');
         const isDone = post.status === '適用済み';
         card.className = `forum-post ${isDone ? 'status-done' : ''}`;
