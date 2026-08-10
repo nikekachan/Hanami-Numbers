@@ -58,6 +58,7 @@
         body.read-only-mode .btn-clear-item,
         body.read-only-mode .btn-gold,
         body.read-only-mode .btn-save,
+        body.read-only-mode .btn-copy-date,
         body.read-only-mode .admin-action-bar,
         body.read-only-mode .forum-select-cb {
             display: none !important;
@@ -112,6 +113,7 @@
         .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
         .btn-style { background: #0f172a; color: #fff; }
         .btn-save { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
+        .btn-copy-date { background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; }
         .btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
         .btn-pink { background: linear-gradient(135deg, #ec4899, #db2777); color: #fff; }
         .btn-green { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
@@ -145,7 +147,7 @@
         }
         .btn-clear-item:hover { background: #fca5a5; color: #7f1d1d; }
 
-        /* コンパクトバッジ表示 */
+        /* コンパクトバッジ表示＆数値入力済みのハイライト強調（投稿 #5） */
         .members-row { display: flex; flex-wrap: wrap; gap: 5px; }
         .member-badge { 
             display: inline-flex; align-items: center; gap: 5px; 
@@ -154,12 +156,30 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.04); white-space: nowrap; touch-action: manipulation;
         }
         .member-badge:active { transform: scale(0.92); }
+        .member-badge.has-count {
+            border-width: 2px;
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.35);
+        }
+        .member-badge.has-count .count-val {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+        }
 
         .badge-yamaguchi { color: #15803d; border-color: #a7f3d0; background: #ecfdf5; }
+        .badge-yamaguchi.has-count { border-color: #10b981; background: #d1fae5; }
+
         .badge-takada { color: #7e22ce; border-color: #e9d5ff; background: #f3e8ff; }
+        .badge-takada.has-count { border-color: #a855f7; background: #e9d5ff; }
+
         .badge-sano { color: #a16207; border-color: #fef08a; background: #fef9c3; }
+        .badge-sano.has-count { border-color: #f59e0b; background: #fef08a; }
+
         .badge-yachiyo { color: #be185d; border-color: #fbcfe8; background: #fce7f3; }
+        .badge-yachiyo.has-count { border-color: #f43f5e; background: #fbcfe8; }
+
         .badge-other { color: #b91c1c; border-color: #fca5a5; background: #fee2e2; }
+        .badge-other.has-count { border-color: #ef4444; background: #fca5a5; }
 
         .count-val { background: #ffffff; padding: 1px 5px; border-radius: 8px; font-size: 10px; font-weight: 900; border: 1px solid rgba(0,0,0,0.1); pointer-events: none; }
 
@@ -289,7 +309,6 @@
         <span id="syncStatusBadge" class="sync-badge saved">☁️ 同期完了</span>
     </div>
 
-    <!-- 独立したPixelコンテストタブを追加 -->
     <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchPage('entryPage')">📝 日別入力</button>
         <button class="tab-btn" onclick="switchPage('comparePage')">📊 個人・比較分析</button>
@@ -305,11 +324,15 @@
 <div id="entryPage" class="page-content active">
     <div class="glass-panel">
         <div class="controls">
-            <div class="control-group">
+            <div class="control-group" style="display:flex; align-items:center; gap:8px;">
                 <span>📅 日付選択:</span>
                 <input type="date" id="datePicker">
+                <!-- 投稿 #5 対応：選択日の入力有無を示すカラーバッジ -->
+                <span id="dateHasDataBadge" style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:12px; background:#e2e8f0; color:#475569;">⚪ 未入力</span>
             </div>
             <button class="btn btn-save" onclick="saveDataToServer(false)">💾 サーバーに保存</button>
+            <!-- 投稿 #6 対応：入力済みデータを別日に移動/上書きコピーボタン -->
+            <button class="btn btn-copy-date" onclick="copyDateData()">📋 本日データを別日に移動(上書き)</button>
             <button class="btn btn-style" id="viewToggleBtn" onclick="toggleView()">👀 表示切り替え: 個人別</button>
             <button class="btn btn-gold" onclick="openTargetModal()">🎯 月間目標設定</button>
             <button class="btn btn-danger" onclick="clearCurrentDateData()">🗑 本日分クリア</button>
@@ -322,8 +345,8 @@
     <div class="glass-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <!-- 投稿 #4 対応：当月合計成約数バッジを削除 -->
                 <h2 style="font-size: 15px; margin: 0;">📈 月間実績 & 着地見込み（花見川 VS 八千代組）</h2>
-                <span id="totalContractsBadge" style="font-size:13px; font-weight:900; background:#dbeafe; color:#1e40af; padding:3px 12px; border-radius:12px;">当月合計成約数: 0 件</span>
             </div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
                 <div class="toggle-wrapper">
@@ -519,7 +542,7 @@
     </div>
 </div>
 
-<!-- NEW PAGE: 📱 独立設営！ラストスパートPixel販買コンテスト専用ページ -->
+<!-- PAGE 6: 📱 独立新設！ラストスパートPixel販買コンテスト専用ページ -->
 <div id="pixelPage" class="page-content">
     <div class="pixel-contest-banner" id="pixelBannerWrap" style="position:relative; cursor:pointer;">
         <span class="copy-hint">💡 長押しで画像コピー</span>
@@ -606,7 +629,7 @@
     </div>
 </div>
 
-<!-- PAGE 6: みんなのご意見箱 -->
+<!-- PAGE 7: みんなのご意見箱 -->
 <div id="forumPage" class="page-content">
     <div class="glass-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
@@ -790,9 +813,6 @@ let mainChartInstance = null;
 let compareChartInstance = null;
 let confettiTriggered = false;
 
-// ⏱ 自動保存タイマー
-let autoSaveTimer = null;
-
 function updateSyncStatus(status) {
     const badge = document.getElementById('syncStatusBadge');
     if (!badge) return;
@@ -803,14 +823,6 @@ function updateSyncStatus(status) {
         badge.className = 'sync-badge saved';
         badge.innerText = '☁️ 同期完了';
     }
-}
-
-function triggerAutoSave() {
-    updateSyncStatus('saving');
-    if (autoSaveTimer) clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(() => {
-        saveDataToServer(true);
-    }, 5000);
 }
 
 function toggleReadOnlyMode(checked) {
@@ -867,7 +879,6 @@ async function loadStoreDataFromServer() {
 }
 
 async function saveDataToServer(silent = false) {
-    if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
     updateSyncStatus('saving');
     localStorage.setItem('store_performance_vs_yachiyo_v5', JSON.stringify(storeData));
     try {
@@ -884,6 +895,38 @@ async function saveDataToServer(silent = false) {
     } catch (e) {
         updateSyncStatus('saved');
         if (!silent) showToastMsg("⚠️ サーバー接続エラー（ローカル保存完了）");
+        renderUI();
+        updateMainChart();
+    }
+}
+
+// 投稿 #6 対応：本日データを別の日に移動/上書きコピーするロジック
+function copyDateData() {
+    if (!storeData.daily[currentDate] || Object.keys(storeData.daily[currentDate]).length === 0) {
+        alert(`[${currentDate}] には移動できるデータがありません。`);
+        return;
+    }
+
+    const targetDate = prompt(`📋 [${currentDate}] の入力データをどの日に移動（上書きコピー）しますか？\n半角で日付を入力してください（例: 2026-08-12）:`, currentDate);
+    if (!targetDate || targetDate === currentDate) return;
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(targetDate)) {
+        alert("日付の形式が正しくありません。（例: 2026-08-12）");
+        return;
+    }
+
+    if (confirm(`【確認】\n[${currentDate}] のデータを [${targetDate}] へ移動します。\n[${targetDate}] に既存データがある場合は上書き消去されます。よろしいですか？`)) {
+        // 対象日にディープコピー
+        storeData.daily[targetDate] = JSON.parse(JSON.stringify(storeData.daily[currentDate]));
+        // コピー元の本日はクリア（移動）
+        delete storeData.daily[currentDate];
+        
+        saveDataToServer();
+        showToastMsg(`📋 [${currentDate}] のデータを [${targetDate}] へ移動しました！`);
+        
+        // 日付選択ピッカーを移動先に自動切り替え
+        currentDate = targetDate;
+        document.getElementById('datePicker').value = targetDate;
         renderUI();
         updateMainChart();
     }
@@ -969,7 +1012,7 @@ function renderUI() {
     const monthStr = currentDate.substring(0, 7);
     const summary = calculateMonthlySummary(monthStr);
 
-    let grandTotalContractsMonth = 0;
+    let dayTotalCount = 0; // 選択日の成約データ合計有無（投稿 #5）
 
     ITEMS.forEach(item => {
         const card = document.createElement('div');
@@ -979,8 +1022,10 @@ function renderUI() {
         ALL_MEMBERS_MASTER.forEach(m => {
             const cnt = summary.totalCounts[item][m.name] || 0;
             totalAct += cnt;
-            grandTotalContractsMonth += cnt;
             totalFcast += summary.forecastCounts[item][m.name] || 0;
+
+            const dayCnt = (dayData[item] && dayData[item][m.name]) || 0;
+            dayTotalCount += dayCnt;
         });
 
         const targetVal = storeData.targets[item] || 0;
@@ -1028,7 +1073,6 @@ function renderUI() {
                     storeData.daily[currentDate][item][m.name] = newVal;
                     renderUI();
                     updateMainChart();
-                    triggerAutoSave();
                 });
                 row.appendChild(badge);
             });
@@ -1044,15 +1088,26 @@ function renderUI() {
         container.appendChild(card);
     });
 
-    const totalBadgeEl = document.getElementById('totalContractsBadge');
-    if (totalBadgeEl) {
-        totalBadgeEl.innerText = `当月合計成約数: ${grandTotalContractsMonth} 件`;
+    // 投稿 #5 対応：選択日にデータが1件以上ある場合は日付バッジをグリーンに色付け
+    const dateBadge = document.getElementById('dateHasDataBadge');
+    if (dateBadge) {
+        if (dayTotalCount > 0) {
+            dateBadge.style.background = '#d1fae5';
+            dateBadge.style.color = '#065f46';
+            dateBadge.innerText = `🟢 入力データあり (${dayTotalCount}件)`;
+        } else {
+            dateBadge.style.background = '#e2e8f0';
+            dateBadge.style.color = '#475569';
+            dateBadge.innerText = `⚪ 未入力`;
+        }
     }
 }
 
+// 投稿 #5 対応：数値が1以上のメンバーバッジにハイライトクラス `.has-count` を動的付与
 function createBadge(displayName, fullName, count, teamName, onChange) {
     const btn = document.createElement('div');
-    btn.className = `member-badge ${BADGE_CLASSES[teamName]}`;
+    const hasCountClass = count > 0 ? 'has-count' : '';
+    btn.className = `member-badge ${BADGE_CLASSES[teamName]} ${hasCountClass}`;
     btn.innerHTML = `<span>${displayName}</span> <span class="count-val">${count}</span>`;
 
     let timer = null, isLongPress = false;
@@ -1096,6 +1151,7 @@ function toggleView() {
     renderUI();
 }
 
+// 投稿 #4 対応：着地見込みは花見川＋八千代の「チーム合計着地見込み」1系列としてグラフ出力
 function updateMainChart() {
     const showTarget = document.getElementById('targetToggle').checked;
     const showForecast = document.getElementById('forecastToggle').checked;
@@ -1103,7 +1159,7 @@ function updateMainChart() {
     
     let targetData = [];
     let hanamigawaActuals = [], yachiyoActuals = [];
-    let hanamigawaForecasts = [], yachiyoForecasts = [];
+    let totalForecasts = []; // 花見川＋八千代の合算着地見込み
 
     ITEMS.forEach(item => {
         let hanaAct = 0, hanaFcast = 0;
@@ -1117,8 +1173,11 @@ function updateMainChart() {
             else { yachiAct += act; yachiFcast += fcast; }
         });
 
-        hanamigawaActuals.push(hanaAct); yachiyoActuals.push(yachiAct);
-        hanamigawaForecasts.push(hanaFcast); yachiyoForecasts.push(yachiFcast);
+        hanamigawaActuals.push(hanaAct);
+        yachiyoActuals.push(yachiAct);
+        
+        // 合算見込み（投稿 #4 要求仕様）
+        totalForecasts.push(hanaFcast + yachiFcast);
 
         targetData.push(storeData.targets[item] || 0);
     });
@@ -1132,9 +1191,15 @@ function updateMainChart() {
     datasets.push({ label: '花見川チーム (実績)', data: hanamigawaActuals, backgroundColor: '#2563eb' });
     datasets.push({ label: '八千代組 (実績)', data: yachiyoActuals, backgroundColor: '#ef4444' });
 
+    // 着地見込みオン時：チーム合算値の1系列のみ描画
     if (showForecast) {
-        datasets.push({ label: '花見川チーム (着地見込み)', data: hanamigawaForecasts, backgroundColor: 'rgba(37, 99, 235, 0.3)', borderColor: '#2563eb', borderWidth: 1 });
-        datasets.push({ label: '八千代組 (着地見込み)', data: yachiyoForecasts, backgroundColor: 'rgba(239, 68, 68, 0.3)', borderColor: '#ef4444', borderWidth: 1 });
+        datasets.push({ 
+            label: '🔮 チーム合計 着地見込み', 
+            data: totalForecasts, 
+            backgroundColor: 'rgba(16, 185, 129, 0.35)', 
+            borderColor: '#10b981', 
+            borderWidth: 1.5 
+        });
     }
 
     const ctx = document.getElementById('summaryChart').getContext('2d');
@@ -1590,7 +1655,7 @@ function renderPixelPage() {
     document.getElementById('pixelCountYachiyo').innerText = `${teamPixelCounts["八千代組"]} 台`;
 
     document.getElementById('pixelBonusHanamigawa').innerText = `褒賞計: ${teamPixelBonuses["花見川"].toLocaleString()} 円`;
-    document.getElementById('pixelBonusYachiyo').innerText = `褒賞計: ${teamPixelBonuses["八千代组"].toLocaleString()} 円`;
+    document.getElementById('pixelBonusYachiyo').innerText = `褒賞計: ${teamPixelBonuses["八千代組"].toLocaleString()} 円`;
 
     const cardH = document.getElementById('pixelTeamHanamigawaCard');
     const cardY = document.getElementById('pixelTeamYachiyoCard');
@@ -1604,7 +1669,7 @@ function renderPixelPage() {
     }
 }
 
-// ---------------- 6. みんなのご意見箱 ----------------
+// ---------------- 6. みんなのご意見箱 & 画像処理ロジック ----------------
 function compressImage(file, maxWidth = 400, quality = 0.4) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1860,7 +1925,6 @@ function deleteSelectedForumPosts() {
     }
 }
 
-// 修正：テキスト出力時に巨大な画像文字列を出さず、簡潔な注記にしてテキストコピーを爆速・安定化
 function exportForumForAI() {
     if (!storeData.forum || storeData.forum.length === 0) {
         alert("分析対象の投稿データがまだありません。");
