@@ -23,17 +23,15 @@ def load_data():
     return {"daily": {}, "targets": {}, "forum": []}
 
 def save_data(data):
-    try:
-        requests.put(JSONBIN_URL, headers=HEADERS, json=data)
-    except Exception as e:
-        print("Save Error:", e)
+    # JSONBinへ送信（エラーレスポンスをチェック）
+    res = requests.put(JSONBIN_URL, headers=HEADERS, json=data)
+    if res.status_code != 200:
+        raise Exception(f"JSONBin保存エラー (HTTP {res.status_code}): {res.text}")
 
-# 通常入力・管理者用ページ
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# 📱 一般スタッフ閲覧専用URL
 @app.route('/view')
 def view_only():
     return render_template('index.html')
@@ -49,6 +47,7 @@ def save_all_data():
         save_data(data)
         return jsonify({"status": "success", "message": "☁️ 保管庫へ正常保存されました！"})
     except Exception as e:
+        print("Save API Error:", e)
         return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':
