@@ -147,7 +147,7 @@
         }
         .btn-clear-item:hover { background: #fca5a5; color: #7f1d1d; }
 
-        /* コンパクトバッジ表示＆数値入力済みのハイライト強調（投稿 #5） */
+        /* コンパクトバッジ表示＆数値入力済みのハイライト強調 */
         .members-row { display: flex; flex-wrap: wrap; gap: 5px; }
         .member-badge { 
             display: inline-flex; align-items: center; gap: 5px; 
@@ -271,8 +271,6 @@
         .status-badge.status-open { background: #fef3c7; color: #92400e; }
         .status-badge.status-completed { background: #d1fae5; color: #065f46; }
 
-        .forum-post-img { max-width: 100%; max-height: 250px; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 10px; cursor: zoom-in; }
-
         .admin-reply-box {
             margin-top: 10px; padding: 10px 12px; background: #eff6ff; border-radius: 10px; border-left: 4px solid var(--accent-blue);
             font-size: 12px; font-weight: 700; color: #1e3a8a;
@@ -345,7 +343,6 @@
     <div class="glass-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                <!-- 投稿 #4 対応：当月合計成約数バッジを削除 -->
                 <h2 style="font-size: 15px; margin: 0;">📈 月間実績 & 着地見込み（花見川 VS 八千代組）</h2>
             </div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -657,16 +654,9 @@
                     </select>
                     <input type="text" id="forumIdeaInput" placeholder="改善案・解決アイデア（任意）">
                 </div>
-                <textarea id="forumTextInput" rows="3" placeholder="要件・ご意見・お困りごとを入力してください... (画像はここに直接コピペ【Ctrl+V / Command+V】も可能です)"></textarea>
+                <textarea id="forumTextInput" rows="3" placeholder="要件・ご意見・お困りごとを入力してください..."></textarea>
                 
-                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-                    <div>
-                        <label style="font-size:12px; font-weight:800; cursor:pointer; background:#e2e8f0; padding:6px 12px; border-radius:10px; display:inline-flex; align-items:center; gap:4px;">
-                            🖼 画像を添付
-                            <input type="file" id="forumImageInput" accept="image/*" style="display:none;">
-                        </label>
-                        <div id="forumImagePreview" style="display:inline-block; margin-left:8px;"></div>
-                    </div>
+                <div style="display:flex; align-items:center; justify-content:flex-end;">
                     <button class="btn btn-pink" onclick="submitForumPost()">✉️ 掲示板に投稿する</button>
                 </div>
             </div>
@@ -698,13 +688,6 @@
         <div style="margin-top: 15px; text-align: right;">
             <button class="btn btn-style" onclick="closeAiExportModal()">閉じる</button>
         </div>
-    </div>
-</div>
-
-<!-- 画像拡大表示モーダル -->
-<div class="modal" id="imageModal" onclick="closeImageModal()">
-    <div style="max-width:90%; max-height:90vh; text-align:center;">
-        <img id="imageModalImg" src="" style="max-width:100%; max-height:85vh; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
     </div>
 </div>
 
@@ -798,13 +781,14 @@ const BADGE_CLASSES = { "新山口": "badge-yamaguchi", "髙田WEST": "badge-tak
 const TEAM_BG_COLORS = { "佐野": "var(--team-sanorリーズ)", "八千代": "var(--team-yachiyo)", "大熊": "var(--team-yamaguchi)", "中村": "var(--team-other)", "高田": "var(--team-takada)" };
 const FOUR_TEAM_COLORS = { "サノリーズ": "var(--team-sanorリーズ-txt)", "新山口": "var(--team-yamaguchi-txt)", "髙田WEST": "var(--team-takada-txt)", "その他": "var(--team-other-txt)" };
 
-let currentDate = new Date().toISOString().split('T')[0];
+// 日本時間 (JST) 日付取得
+const nowJST = new Date(new Date().getTime() + (9 * 60 * 60 * 1000));
+let currentDate = nowJST.toISOString().split('T')[0];
 let currentMonth = currentDate.substring(0, 7);
 let storeData = { daily: {}, targets: {}, forum: [] };
 let viewMode = 'individual';
 let isReadOnly = false;
 let currentForumFilter = 'all';
-let currentPostImageBase64 = null;
 
 let selectedMembersForCompare = ALL_MEMBERS_MASTER.map(m => m.name);
 let selectedItemsForCompare = [...ITEMS];
@@ -863,6 +847,21 @@ async function loadStoreDataFromServer() {
         if (!storeData.daily) storeData.daily = {};
         if (!storeData.targets) storeData.targets = {};
         if (!storeData.forum) storeData.forum = [];
+        
+        // 100KB超えエラー原因の画像データを起動時に自動パージ（完全無効化）
+        let purged = false;
+        if (storeData.forum && storeData.forum.length > 0) {
+            storeData.forum.forEach(post => {
+                if (post.image) {
+                    delete post.image;
+                    purged = true;
+                }
+            });
+        }
+        if (purged) {
+            await saveDataToServer(true);
+        }
+
         updateSyncStatus('saved');
         renderUI();
         updateMainChart();
@@ -888,13 +887,17 @@ async function saveDataToServer(silent = false) {
             body: JSON.stringify(storeData)
         });
         const result = await res.json();
-        updateSyncStatus('saved');
-        if (!silent) showToastMsg(result.message || "☁️ サーバーへ保存しました");
+        if (res.status === 200 && result.status === "success") {
+            updateSyncStatus('saved');
+            if (!silent) showToastMsg(result.message || "☁️ サーバーへ保存しました");
+        } else {
+            throw new Error(result.message || "保存失敗");
+        }
         renderUI();
         updateMainChart();
     } catch (e) {
         updateSyncStatus('saved');
-        if (!silent) showToastMsg("⚠️ サーバー接続エラー（ローカル保存完了）");
+        if (!silent) alert(`⚠️ サーバー保存エラー:\n${e.message}`);
         renderUI();
         updateMainChart();
     }
@@ -916,15 +919,12 @@ function copyDateData() {
     }
 
     if (confirm(`【確認】\n[${currentDate}] のデータを [${targetDate}] へ移動します。\n[${targetDate}] に既存データがある場合は上書き消去されます。よろしいですか？`)) {
-        // 対象日にディープコピー
         storeData.daily[targetDate] = JSON.parse(JSON.stringify(storeData.daily[currentDate]));
-        // コピー元の本日はクリア（移動）
         delete storeData.daily[currentDate];
         
         saveDataToServer();
         showToastMsg(`📋 [${currentDate}] のデータを [${targetDate}] へ移動しました！`);
         
-        // 日付選択ピッカーを移動先に自動切り替え
         currentDate = targetDate;
         document.getElementById('datePicker').value = targetDate;
         renderUI();
@@ -1012,7 +1012,7 @@ function renderUI() {
     const monthStr = currentDate.substring(0, 7);
     const summary = calculateMonthlySummary(monthStr);
 
-    let dayTotalCount = 0; // 選択日の成約データ合計有無（投稿 #5）
+    let dayTotalCount = 0;
 
     ITEMS.forEach(item => {
         const card = document.createElement('div');
@@ -1088,7 +1088,6 @@ function renderUI() {
         container.appendChild(card);
     });
 
-    // 投稿 #5 対応：選択日にデータが1件以上ある場合は日付バッジをグリーンに色付け
     const dateBadge = document.getElementById('dateHasDataBadge');
     if (dateBadge) {
         if (dayTotalCount > 0) {
@@ -1103,7 +1102,6 @@ function renderUI() {
     }
 }
 
-// 投稿 #5 対応：数値が1以上のメンバーバッジにハイライトクラス `.has-count` を動的付与
 function createBadge(displayName, fullName, count, teamName, onChange) {
     const btn = document.createElement('div');
     const hasCountClass = count > 0 ? 'has-count' : '';
@@ -1151,7 +1149,6 @@ function toggleView() {
     renderUI();
 }
 
-// 投稿 #4 対応：着地見込みは花見川＋八千代の「チーム合計着地見込み」1系列としてグラフ出力
 function updateMainChart() {
     const showTarget = document.getElementById('targetToggle').checked;
     const showForecast = document.getElementById('forecastToggle').checked;
@@ -1159,7 +1156,7 @@ function updateMainChart() {
     
     let targetData = [];
     let hanamigawaActuals = [], yachiyoActuals = [];
-    let totalForecasts = []; // 花見川＋八千代の合算着地見込み
+    let totalForecasts = [];
 
     ITEMS.forEach(item => {
         let hanaAct = 0, hanaFcast = 0;
@@ -1175,8 +1172,6 @@ function updateMainChart() {
 
         hanamigawaActuals.push(hanaAct);
         yachiyoActuals.push(yachiAct);
-        
-        // 合算見込み（投稿 #4 要求仕様）
         totalForecasts.push(hanaFcast + yachiFcast);
 
         targetData.push(storeData.targets[item] || 0);
@@ -1191,7 +1186,6 @@ function updateMainChart() {
     datasets.push({ label: '花見川チーム (実績)', data: hanamigawaActuals, backgroundColor: '#2563eb' });
     datasets.push({ label: '八千代組 (実績)', data: yachiyoActuals, backgroundColor: '#ef4444' });
 
-    // 着地見込みオン時：チーム合算値の1系列のみ描画
     if (showForecast) {
         datasets.push({ 
             label: '🔮 チーム合計 着地見込み', 
@@ -1580,10 +1574,10 @@ function renderFlowerPage() {
     teamBody.innerHTML = teamHTML;
 }
 
-// ---------------- 📱 投稿 #1 要望：独立新設！Pixelコンテスト専用ページ計算＆描画 ----------------
+// ---------------- 📱 Pixelコンテスト専用ページ計算＆描画 ----------------
 function renderPixelPage() {
-    const isWUp = document.getElementById('wUpToggle').checked; // Wアップチャンススイッチ状態
-    const bonusPerUnit = isWUp ? 3000 : 1500; // 単価 (通常:1500円 / Wアップ:3000円)
+    const isWUp = document.getElementById('wUpToggle').checked;
+    const bonusPerUnit = isWUp ? 3000 : 1500;
 
     let memberPixelSummary = {};
     let teamPixelCounts = { "花見川": 0, "八千代組": 0 };
@@ -1593,7 +1587,6 @@ function renderPixelPage() {
         memberPixelSummary[m.name] = { pNormal: 0, pHigh: 0, totalCount: 0, bonus: 0 };
     });
 
-    // 期間 8月8日～8月13日 の日別データのみを抽出集計
     const contestDates = ["2026-08-08", "2026-08-09", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13"];
     
     contestDates.forEach(dateStr => {
@@ -1610,13 +1603,12 @@ function renderPixelPage() {
         }
     });
 
-    // 褒賞計算（期間中2台以上の販売が対象条件）
     ALL_MEMBERS_MASTER.forEach(m => {
         const summary = memberPixelSummary[m.name];
         if (summary.totalCount >= 2) {
             summary.bonus = summary.totalCount * bonusPerUnit;
         } else {
-            summary.bonus = 0; // 2台未満は対象外
+            summary.bonus = 0;
         }
 
         if (m.group === "花見川") {
@@ -1628,7 +1620,6 @@ function renderPixelPage() {
         }
     });
 
-    // 個人表描画
     const tbody = document.getElementById('pixelIndividualTableBody');
     let html = '';
     const sortedMembers = [...ALL_MEMBERS_MASTER].sort((a, b) => memberPixelSummary[b.name].totalCount - memberPixelSummary[a.name].totalCount);
@@ -1650,7 +1641,6 @@ function renderPixelPage() {
     });
     tbody.innerHTML = html;
 
-    // チーム対抗ボード更新
     document.getElementById('pixelCountHanamigawa').innerText = `${teamPixelCounts["花見川"]} 台`;
     document.getElementById('pixelCountYachiyo').innerText = `${teamPixelCounts["八千代組"]} 台`;
 
@@ -1669,88 +1659,7 @@ function renderPixelPage() {
     }
 }
 
-// ---------------- 6. みんなのご意見箱 & 画像処理ロジック ----------------
-function compressImage(file, maxWidth = 400, quality = 0.4) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                if (width > maxWidth) {
-                    height = Math.round((height * maxWidth) / width);
-                    width = maxWidth;
-                }
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', quality));
-            };
-            img.src = e.target.result;
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
-function showImagePreview(base64) {
-    const previewDiv = document.getElementById('forumImagePreview');
-    if (previewDiv) {
-        previewDiv.innerHTML = `
-            <div style="position:relative; display:inline-block;">
-                <img src="${base64}" style="height:32px; border-radius:6px; border:1px solid #cbd5e1; vertical-align:middle;">
-                <button onclick="clearPostImage()" style="background:#dc2626; color:#fff; border:none; border-radius:50%; width:16px; height:16px; font-size:10px; cursor:pointer; margin-left:4px; font-weight:900;">✕</button>
-            </div>
-        `;
-    }
-}
-
-function clearPostImage() {
-    currentPostImageBase64 = null;
-    const previewDiv = document.getElementById('forumImagePreview');
-    if (previewDiv) previewDiv.innerHTML = '';
-    const fileInput = document.getElementById('forumImageInput');
-    if (fileInput) fileInput.value = '';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const textInput = document.getElementById('forumTextInput');
-    if (textInput) {
-        textInput.addEventListener('paste', async (e) => {
-            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-            for (let item of items) {
-                if (item.type.indexOf('image') !== -1) {
-                    const file = item.getAsFile();
-                    try {
-                        currentPostImageBase64 = await compressImage(file);
-                        showImagePreview(currentPostImageBase64);
-                        showToastMsg("📋 クリップボードの画像を添付しました！");
-                    } catch (err) {
-                        console.error("画像読み込み失敗", err);
-                    }
-                }
-            }
-        });
-    }
-
-    const fileInput = document.getElementById('forumImageInput');
-    if (fileInput) {
-        fileInput.addEventListener('change', async (e) => {
-            if (e.target.files && e.target.files[0]) {
-                try {
-                    currentPostImageBase64 = await compressImage(e.target.files[0]);
-                    showImagePreview(currentPostImageBase64);
-                } catch (err) {
-                    console.error("画像読み込み失敗", err);
-                }
-            }
-        });
-    }
-});
-
+// ---------------- 6. みんなのご意見箱 (テキスト専用) ----------------
 function setForumFilter(filterType, btnEl) {
     currentForumFilter = filterType;
     document.querySelectorAll('.forum-filter-btn').forEach(b => b.classList.remove('active'));
@@ -1791,7 +1700,6 @@ function renderForumPage() {
         const statusText = post.status || '未対応';
         const statusClass = isDone ? 'status-completed' : 'status-open';
         const replyHtml = post.reply ? `<div class="admin-reply-box">💬 <b>管理者返信:</b> ${post.reply}</div>` : '';
-        const imageHtml = post.image ? `<div><img src="${post.image}" class="forum-post-img" onclick="openImageModal('${post.image}')" title="クリックで拡大"></div>` : '';
 
         card.innerHTML = `
             <div class="forum-post-header">
@@ -1805,7 +1713,6 @@ function renderForumPage() {
                 <span>📅 ${post.date}</span>
             </div>
             <div style="font-size:13px; font-weight:700; color:var(--text-main); white-space:pre-wrap;">${post.text}${ideaText}</div>
-            ${imageHtml}
             ${replyHtml}
 
             <div class="admin-action-bar">
@@ -1831,8 +1738,8 @@ function submitForumPost() {
     const idea = ideaInput.value.trim();
     const text = textInput.value.trim();
 
-    if (!text && !currentPostImageBase64) {
-        alert("要件・お困りごと・ご意見内容（または添付画像）を入力してください。");
+    if (!text) {
+        alert("要件・お困りごと・ご意見内容を入力してください。");
         return;
     }
 
@@ -1843,7 +1750,6 @@ function submitForumPost() {
         priority: priority,
         idea: idea,
         text: text,
-        image: currentPostImageBase64 || null,
         status: '未対応',
         reply: '',
         date: new Date().toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
@@ -1855,7 +1761,6 @@ function submitForumPost() {
     saveDataToServer();
     textInput.value = '';
     ideaInput.value = '';
-    clearPostImage();
     showToastMsg("✉️ 掲示板にご意見を投稿しました！");
     renderForumPage();
 }
@@ -1867,13 +1772,8 @@ function togglePostStatus(postId) {
         const post = storeData.forum.find(p => p.id === postId);
         if (post) {
             post.status = (post.status === '適用済み') ? '未対応' : '適用済み';
-            if (post.status === '適用済み' && post.image) {
-                delete post.image;
-                showToastMsg("ステータスを「適用済み」に変更し、容量節約のため添付画像を自動削除しました");
-            } else {
-                showToastMsg(`ステータスを「${post.status}」に変更しました`);
-            }
             saveDataToServer();
+            showToastMsg(`ステータスを「${post.status}」に変更しました`);
             renderForumPage();
         }
     } else {
@@ -1963,7 +1863,6 @@ function exportForumForAI() {
         promptText += `・ステータス: ${post.status || '未対応'}\n`;
         promptText += `・要件・お困りごと: ${post.text}\n`;
         if (post.idea) promptText += `・現場からの改善アイデア: ${post.idea}\n`;
-        if (post.image) promptText += `・添付画像: [参考画像添付あり]\n`;
         if (post.reply) promptText += `・管理者返信: ${post.reply}\n`;
     });
 
@@ -1981,15 +1880,6 @@ function exportForumForAI() {
 
 function closeAiExportModal() {
     document.getElementById('aiExportModal').style.display = 'none';
-}
-
-function openImageModal(imgSrc) {
-    document.getElementById('imageModalImg').src = imgSrc;
-    document.getElementById('imageModal').style.display = 'flex';
-}
-
-function closeImageModal() {
-    document.getElementById('imageModal').style.display = 'none';
 }
 
 function triggerConfetti() {
