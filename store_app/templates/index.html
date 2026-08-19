@@ -90,9 +90,10 @@
         .sync-badge.saving { background: #fef3c7; color: #92400e; }
         .sync-badge.saved { background: #d1fae5; color: #065f46; }
 
-        .nav-tabs { display: flex; gap: 6px; background: #f1f5f9; padding: 5px; border-radius: 14px; flex-wrap: wrap; width: 100%; }
-        @media (min-width: 768px) { .nav-tabs { width: auto; } }
-        .tab-btn { flex: 1; text-align: center; padding: 9px 12px; font-size: 12.5px; font-weight: 800; border: none; border-radius: 10px; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        /* タブがスマホで隠れないようにサイズと折り返しを調整 */
+        .nav-tabs { display: flex; gap: 4px; background: #f1f5f9; padding: 5px; border-radius: 14px; flex-wrap: wrap; width: 100%; justify-content: center; }
+        @media (min-width: 768px) { .nav-tabs { width: auto; justify-content: flex-start; } }
+        .tab-btn { flex: 1 1 auto; text-align: center; padding: 8px 10px; font-size: 12px; font-weight: 800; border: none; border-radius: 10px; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s; white-space: nowrap; }
         .tab-btn:hover { color: var(--accent-blue); transform: translateY(-1px); }
         .tab-btn.active { background: var(--panel-bg); color: var(--accent-blue); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
@@ -539,7 +540,7 @@
     </div>
 </div>
 
-<!-- PAGE 6: 📱 独立新設！ラストスパートPixel販買コンテスト専用ページ -->
+<!-- PAGE 6: 📱 Pixelコンテスト専用ページ -->
 <div id="pixelPage" class="page-content">
     <div class="pixel-contest-banner" id="pixelBannerWrap" style="position:relative; cursor:pointer;">
         <span class="copy-hint">💡 長押しで画像コピー</span>
@@ -550,7 +551,7 @@
                 <div style="font-size:13px; opacity:0.9;">8月特定期間インセンティブ最終追い込み！ <b>【期間: 8月8日(土)～13日(木)】</b></div>
             </div>
 
-            <!-- 画像右側のWアップチャンス条件ON/OFFトグル -->
+            <!-- Wアップチャンス条件ON/OFFトグル -->
             <div class="toggle-wrapper" style="background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4);">
                 <span style="font-size:12px; font-weight:900; color:#fff;">🔥 Wアップチャンス (1台3,000円):</span>
                 <label class="switch">
@@ -626,7 +627,7 @@
     </div>
 </div>
 
-<!-- PAGE 7: みんなのご意見箱 -->
+<!-- PAGE 7: みんなのご意見箱 (画像無効化版) -->
 <div id="forumPage" class="page-content">
     <div class="glass-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
@@ -707,6 +708,10 @@
 
 <script>
 const AUTH_PASS = "hanami364"; // パスワード
+
+// ↓↓↓ コピーしたGASのURLをここに貼り付けてください ↓↓↓
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzUjze_KKgIQQkziGUxK3W3eAkMFy1AG2jci7D0c-uZKp58gUYXKytJVfvEOvdASYE9/exec";
+// ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 // 商材順序マスター
 const ITEMS = [
@@ -797,6 +802,9 @@ let mainChartInstance = null;
 let compareChartInstance = null;
 let confettiTriggered = false;
 
+// ⏱ 自動保存タイマー
+let autoSaveTimer = null;
+
 function updateSyncStatus(status) {
     const badge = document.getElementById('syncStatusBadge');
     if (!badge) return;
@@ -807,6 +815,14 @@ function updateSyncStatus(status) {
         badge.className = 'sync-badge saved';
         badge.innerText = '☁️ 同期完了';
     }
+}
+
+function triggerAutoSave() {
+    updateSyncStatus('saving');
+    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+        saveDataToServer(true);
+    }, 5000);
 }
 
 function toggleReadOnlyMode(checked) {
@@ -840,15 +856,22 @@ function switchPage(pageId) {
     else if (pageId === 'forumPage') { renderForumPage(); }
 }
 
+// -------------------------------------------------------------
+// GAS用通信ロジック
+// -------------------------------------------------------------
 async function loadStoreDataFromServer() {
     try {
-        const res = await fetch('/api/get_all_data');
-        storeData = await res.json();
+        const res = await fetch(GAS_URL);
+        const textData = await res.text();
+        
+        // シートが空の場合の安全対策
+        storeData = textData && textData.trim() !== "" ? JSON.parse(textData) : {};
+
         if (!storeData.daily) storeData.daily = {};
         if (!storeData.targets) storeData.targets = {};
         if (!storeData.forum) storeData.forum = [];
-        
-        // 100KB超えエラー原因の画像データを起動時に自動パージ（完全無効化）
+
+        // 過去の重い画像データが残っていたら自動パージ（完全無効化・軽量化）
         let purged = false;
         if (storeData.forum && storeData.forum.length > 0) {
             storeData.forum.forEach(post => {
@@ -859,14 +882,14 @@ async function loadStoreDataFromServer() {
             });
         }
         if (purged) {
-            await saveDataToServer(true);
+            saveDataToServer(true); // バックグラウンドで上書き保存
         }
-
+        
         updateSyncStatus('saved');
         renderUI();
         updateMainChart();
     } catch (e) {
-        console.error("サーバー読み込みエラー", e);
+        console.error("スプレッドシート読み込みエラー", e);
         const local = localStorage.getItem('store_performance_vs_yachiyo_v5');
         if (local) {
             try { storeData = JSON.parse(local); } catch (err) {}
@@ -878,32 +901,39 @@ async function loadStoreDataFromServer() {
 }
 
 async function saveDataToServer(silent = false) {
+    if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
     updateSyncStatus('saving');
     localStorage.setItem('store_performance_vs_yachiyo_v5', JSON.stringify(storeData));
+    
     try {
-        const res = await fetch('/api/save_all_data', {
+        // GASへのPOST通信はCORSエラーを回避するため text/plain で送信します
+        const res = await fetch(GAS_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'text/plain'
+            },
             body: JSON.stringify(storeData)
         });
         const result = await res.json();
-        if (res.status === 200 && result.status === "success") {
+
+        if (result.status === "success") {
             updateSyncStatus('saved');
-            if (!silent) showToastMsg(result.message || "☁️ サーバーへ保存しました");
+            if (!silent) showToastMsg(result.message || "☁️ スプレッドシートへ保存しました");
         } else {
-            throw new Error(result.message || "保存失敗");
+            throw new Error(result.message);
         }
         renderUI();
         updateMainChart();
     } catch (e) {
         updateSyncStatus('saved');
-        if (!silent) alert(`⚠️ サーバー保存エラー:\n${e.message}`);
+        if (!silent) alert(`⚠️ スプレッドシート保存エラー:\n${e.message}`);
         renderUI();
         updateMainChart();
     }
 }
 
-// 投稿 #6 対応：本日データを別の日に移動/上書きコピーするロジック
+// -------------------------------------------------------------
+
 function copyDateData() {
     if (!storeData.daily[currentDate] || Object.keys(storeData.daily[currentDate]).length === 0) {
         alert(`[${currentDate}] には移動できるデータがありません。`);
@@ -1073,6 +1103,7 @@ function renderUI() {
                     storeData.daily[currentDate][item][m.name] = newVal;
                     renderUI();
                     updateMainChart();
+                    triggerAutoSave();
                 });
                 row.appendChild(badge);
             });
@@ -1574,9 +1605,10 @@ function renderFlowerPage() {
     teamBody.innerHTML = teamHTML;
 }
 
-// ---------------- 📱 Pixelコンテスト専用ページ計算＆描画 ----------------
+// ---------------- 6. 📱 Pixelコンテスト専用ページ計算＆描画 ----------------
 function renderPixelPage() {
-    const isWUp = document.getElementById('wUpToggle').checked;
+    const wUpEl = document.getElementById('wUpToggle');
+    const isWUp = wUpEl ? wUpEl.checked : false;
     const bonusPerUnit = isWUp ? 3000 : 1500;
 
     let memberPixelSummary = {};
@@ -1621,45 +1653,53 @@ function renderPixelPage() {
     });
 
     const tbody = document.getElementById('pixelIndividualTableBody');
-    let html = '';
-    const sortedMembers = [...ALL_MEMBERS_MASTER].sort((a, b) => memberPixelSummary[b.name].totalCount - memberPixelSummary[a.name].totalCount);
+    if(tbody) {
+        let html = '';
+        const sortedMembers = [...ALL_MEMBERS_MASTER].sort((a, b) => memberPixelSummary[b.name].totalCount - memberPixelSummary[a.name].totalCount);
 
-    sortedMembers.forEach((m, idx) => {
-        const d = memberPixelSummary[m.name];
-        const groupColor = m.group === "花見川" ? "color:var(--team-hanamigawa);" : "color:var(--team-yachiyo-txt);";
-        html += `
-            <tr>
-                <td><b>${idx + 1}位</b></td>
-                <td><b>${m.name}</b></td>
-                <td style="${groupColor} font-weight:800;">${m.team}</td>
-                <td>${d.pNormal} 台</td>
-                <td>${d.pHigh} 台</td>
-                <td><b style="font-size:15px; color:var(--accent-blue);">${d.totalCount} 台</b></td>
-                <td><b style="font-size:15px; color:var(--accent-gold);">${d.bonus.toLocaleString()} 円</b></td>
-            </tr>
-        `;
-    });
-    tbody.innerHTML = html;
+        sortedMembers.forEach((m, idx) => {
+            const d = memberPixelSummary[m.name];
+            const groupColor = m.group === "花見川" ? "color:var(--team-hanamigawa);" : "color:var(--team-yachiyo-txt);";
+            html += `
+                <tr>
+                    <td><b>${idx + 1}位</b></td>
+                    <td><b>${m.name}</b></td>
+                    <td style="${groupColor} font-weight:800;">${m.team}</td>
+                    <td>${d.pNormal} 台</td>
+                    <td>${d.pHigh} 台</td>
+                    <td><b style="font-size:15px; color:var(--accent-blue);">${d.totalCount} 台</b></td>
+                    <td><b style="font-size:15px; color:var(--accent-gold);">${d.bonus.toLocaleString()} 円</b></td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
 
-    document.getElementById('pixelCountHanamigawa').innerText = `${teamPixelCounts["花見川"]} 台`;
-    document.getElementById('pixelCountYachiyo').innerText = `${teamPixelCounts["八千代組"]} 台`;
+    const pHanamigawa = document.getElementById('pixelCountHanamigawa');
+    if(pHanamigawa) pHanamigawa.innerText = `${teamPixelCounts["花見川"]} 台`;
+    
+    const pYachiyo = document.getElementById('pixelCountYachiyo');
+    if(pYachiyo) pYachiyo.innerText = `${teamPixelCounts["八千代組"]} 台`;
 
-    document.getElementById('pixelBonusHanamigawa').innerText = `褒賞計: ${teamPixelBonuses["花見川"].toLocaleString()} 円`;
-    document.getElementById('pixelBonusYachiyo').innerText = `褒賞計: ${teamPixelBonuses["八千代組"].toLocaleString()} 円`;
+    const bHanamigawa = document.getElementById('pixelBonusHanamigawa');
+    if(bHanamigawa) bHanamigawa.innerText = `褒賞計: ${teamPixelBonuses["花見川"].toLocaleString()} 円`;
+    
+    const bYachiyo = document.getElementById('pixelBonusYachiyo');
+    if(bYachiyo) bYachiyo.innerText = `褒賞計: ${teamPixelBonuses["八千代組"].toLocaleString()} 円`;
 
     const cardH = document.getElementById('pixelTeamHanamigawaCard');
     const cardY = document.getElementById('pixelTeamYachiyoCard');
-    cardH.classList.remove('winner');
-    cardY.classList.remove('winner');
+    if(cardH) cardH.classList.remove('winner');
+    if(cardY) cardY.classList.remove('winner');
 
     if (teamPixelCounts["花見川"] > teamPixelCounts["八千代組"]) {
-        cardH.classList.add('winner');
+        if(cardH) cardH.classList.add('winner');
     } else if (teamPixelCounts["八千代組"] > teamPixelCounts["花見川"]) {
-        cardY.classList.add('winner');
+        if(cardY) cardY.classList.add('winner');
     }
 }
 
-// ---------------- 6. みんなのご意見箱 (テキスト専用) ----------------
+// ---------------- 7. みんなのご意見箱 (画像無効化版) ----------------
 function setForumFilter(filterType, btnEl) {
     currentForumFilter = filterType;
     document.querySelectorAll('.forum-filter-btn').forEach(b => b.classList.remove('active'));
@@ -1909,10 +1949,12 @@ function setupChartCopy(wrapId, chartInstanceGetter) {
             showToastMsg("📋 グラフ画像をコピーしました！");
         } catch (err) { alert("画像コピーに対応していないブラウザです。"); }
     };
-    wrap.addEventListener('mousedown', () => { timer = setTimeout(copyImage, 800); });
-    wrap.addEventListener('mouseup', () => clearTimeout(timer));
-    wrap.addEventListener('touchstart', () => { timer = setTimeout(copyImage, 800); }, { passive: true });
-    wrap.addEventListener('touchend', () => clearTimeout(timer));
+    if(wrap) {
+        wrap.addEventListener('mousedown', () => { timer = setTimeout(copyImage, 800); });
+        wrap.addEventListener('mouseup', () => clearTimeout(timer));
+        wrap.addEventListener('touchstart', () => { timer = setTimeout(copyImage, 800); }, { passive: true });
+        wrap.addEventListener('touchend', () => clearTimeout(timer));
+    }
 }
 
 function setupArenaCopy(wrapId) {
@@ -1930,14 +1972,17 @@ function setupArenaCopy(wrapId) {
             });
         } catch (err) { alert("画像コピーに対応していないブラウザです。"); }
     };
-    wrap.addEventListener('mousedown', () => { timer = setTimeout(copyAreaImage, 800); });
-    wrap.addEventListener('mouseup', () => clearTimeout(timer));
-    wrap.addEventListener('touchstart', () => { timer = setTimeout(copyAreaImage, 800); }, { passive: true });
-    wrap.addEventListener('touchend', () => clearTimeout(timer));
+    if(wrap) {
+        wrap.addEventListener('mousedown', () => { timer = setTimeout(copyAreaImage, 800); });
+        wrap.addEventListener('mouseup', () => clearTimeout(timer));
+        wrap.addEventListener('touchstart', () => { timer = setTimeout(copyAreaImage, 800); }, { passive: true });
+        wrap.addEventListener('touchend', () => clearTimeout(timer));
+    }
 }
 
 function showToastMsg(msg) {
     const toast = document.getElementById('copyToast');
+    if(!toast) return;
     toast.innerText = msg;
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3000);
